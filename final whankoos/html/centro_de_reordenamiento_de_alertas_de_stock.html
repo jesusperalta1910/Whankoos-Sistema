@@ -1,0 +1,922 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Whankoos POS Pro - Centro de Alertas y Reorden de Stock</title>
+    <link rel="stylesheet" href="../css/main.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  
+  <script type="module" src="https://static.rocket.new/rocket-web.js?_cfg=https%3A%2F%2Fwhankoosp1201back.builtwithrocket.new&_be=https%3A%2F%2Fapplication.rocket.new&_v=0.1.9"></script>
+  <script type="module" src="https://static.rocket.new/rocket-shot.js?v=0.0.1"></script>
+  </head>
+<body class="bg-background min-h-screen">
+    <!-- Header -->
+    <header class="bg-white shadow-card border-b border-border">
+        <div class="max-w-full mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <!-- Logo -->
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 bg-gradient-to-br from-primary-500 to-secondary-600 rounded-lg flex items-center justify-center">
+                        <i class="fas fa-pizza-slice text-white text-lg"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-xl font-bold text-text-primary">Whankoos POS Pro</h1>
+                        <p class="text-sm text-text-secondary">Centro de Alertas y Reorden</p>
+                    </div>
+                </div>
+
+                <!-- Navigation -->
+                <nav class="hidden md:flex items-center space-x-4">
+                    <a href="main_pos_dashboard.html" class="px-4 py-2 text-text-secondary hover:text-primary-500 transition-micro">
+                        <i class="fas fa-home mr-2"></i>Dashboard
+                    </a>
+                    <a href="inventory_management_dashboard.html" class="px-4 py-2 text-text-secondary hover:text-primary-500 transition-micro">
+                        <i class="fas fa-boxes mr-2"></i>Inventario
+                    </a>
+                    <a href="stock_alerts_reorder_center.html" class="px-4 py-2 bg-primary-500 text-white rounded-button font-medium">
+                        <i class="fas fa-exclamation-triangle mr-2"></i>Alertas
+                    </a>
+                    <a href="exchange_rate_management.html" class="px-4 py-2 text-text-secondary hover:text-primary-500 transition-micro">
+                        <i class="fas fa-exchange-alt mr-2"></i>Tasas
+                    </a>
+                    <a href="sales_history_analytics.html" class="px-4 py-2 text-text-secondary hover:text-primary-500 transition-micro">
+                        <i class="fas fa-chart-line mr-2"></i>Ventas
+                    </a>
+                </nav>
+
+                <!-- Mobile Menu Button -->
+                <button class="md:hidden p-2 text-text-secondary hover:text-primary-500" onclick="toggleMobileMenu()">
+                    <i class="fas fa-bars text-xl"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Mobile Navigation -->
+        <div id="mobileMenu" class="hidden md:hidden bg-white border-t border-border">
+            <div class="px-4 py-2 space-y-2">
+                <a href="main_pos_dashboard.html" class="block px-4 py-2 text-text-secondary hover:text-primary-500 transition-micro">
+                    <i class="fas fa-home mr-2"></i>Dashboard
+                </a>
+                <a href="inventory_management_dashboard.html" class="block px-4 py-2 text-text-secondary hover:text-primary-500 transition-micro">
+                    <i class="fas fa-boxes mr-2"></i>Inventario
+                </a>
+                <a href="stock_alerts_reorder_center.html" class="block px-4 py-2 bg-primary-500 text-white rounded-button font-medium">
+                    <i class="fas fa-exclamation-triangle mr-2"></i>Centro de Alertas
+                </a>
+                <a href="exchange_rate_management.html" class="block px-4 py-2 text-text-secondary hover:text-primary-500 transition-micro">
+                    <i class="fas fa-exchange-alt mr-2"></i>Tasas de Cambio
+                </a>
+                <a href="sales_history_analytics.html" class="block px-4 py-2 text-text-secondary hover:text-primary-500 transition-micro">
+                    <i class="fas fa-chart-line mr-2"></i>Historial de Ventas
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="flex-1 p-4 lg:p-6">
+        <!-- Page Header -->
+        <div class="mb-6">
+            <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between">
+                <div>
+                    <h1 class="text-2xl font-bold text-text-primary mb-2">Centro de Alertas y Reorden de Stock</h1>
+                    <p class="text-text-secondary">Monitorea el inventario, gestiona alertas de stock bajo y automatiza reórdenes de ingredientes</p>
+                </div>
+                <div class="mt-4 lg:mt-0 flex space-x-3">
+                    <button onclick="refreshAlerts()" class="px-4 py-2 bg-primary-500 text-white rounded-button hover:bg-primary-600 transition-micro">
+                        <i class="fas fa-sync-alt mr-2"></i>Actualizar
+                    </button>
+                    <button onclick="openBulkReorderModal()" class="px-4 py-2 border border-border text-text-primary rounded-button hover:bg-gray-50 transition-micro">
+                        <i class="fas fa-shopping-cart mr-2"></i>Reorden Masivo
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Alert Summary Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+            <div class="bg-white rounded-lg shadow-card p-4 border-l-4 border-error-500">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm font-medium text-text-secondary">Crítico</p>
+                        <p class="text-2xl font-bold text-error-600" id="criticalCount">5</p>
+                        <p class="text-xs text-error-500">Stock agotado</p>
+                    </div>
+                    <div class="w-12 h-12 bg-error-100 rounded-lg flex items-center justify-center">
+                        <i class="fas fa-exclamation-triangle text-error-500 text-xl"></i>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-lg shadow-card p-4 border-l-4 border-warning-500">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm font-medium text-text-secondary">Advertencia</p>
+                        <p class="text-2xl font-bold text-warning-600" id="warningCount">8</p>
+                        <p class="text-xs text-warning-500">Stock bajo</p>
+                    </div>
+                    <div class="w-12 h-12 bg-warning-100 rounded-lg flex items-center justify-center">
+                        <i class="fas fa-exclamation text-warning-500 text-xl"></i>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-lg shadow-card p-4 border-l-4 border-accent-500">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm font-medium text-text-secondary">Próximos a vencer</p>
+                        <p class="text-2xl font-bold text-accent-600" id="expiringCount">3</p>
+                        <p class="text-xs text-accent-500">En 7 días</p>
+                    </div>
+                    <div class="w-12 h-12 bg-accent-100 rounded-lg flex items-center justify-center">
+                        <i class="fas fa-clock text-accent-500 text-xl"></i>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-lg shadow-card p-4 border-l-4 border-success-500">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm font-medium text-text-secondary">Reórdenes activas</p>
+                        <p class="text-2xl font-bold text-success-600" id="activeReorders">4</p>
+                        <p class="text-xs text-success-500">En proceso</p>
+                    </div>
+                    <div class="w-12 h-12 bg-success-100 rounded-lg flex items-center justify-center">
+                        <i class="fas fa-shopping-basket text-success-500 text-xl"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <!-- Left Column - Alerts Panel -->
+            <div class="lg:col-span-2">
+                <!-- Alert Filters -->
+                <div class="bg-white rounded-lg shadow-card p-4 mb-4">
+                    <div class="flex flex-wrap items-center gap-3">
+                        <span class="text-sm font-medium text-text-primary">Filtros:</span>
+                        <button onclick="filterAlerts('all')" class="alert-filter px-3 py-1 text-sm rounded-full bg-primary-500 text-white" data-filter="all">
+                            Todas
+                        </button>
+                        <button onclick="filterAlerts('critical')" class="alert-filter px-3 py-1 text-sm rounded-full border border-error-500 text-error-500" data-filter="critical">
+                            Críticas
+                        </button>
+                        <button onclick="filterAlerts('warning')" class="alert-filter px-3 py-1 text-sm rounded-full border border-warning-500 text-warning-500" data-filter="warning">
+                            Advertencias
+                        </button>
+                        <button onclick="filterAlerts('expiring')" class="alert-filter px-3 py-1 text-sm rounded-full border border-accent-500 text-accent-500" data-filter="expiring">
+                            Por vencer
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Alerts List -->
+                <div class="bg-white rounded-lg shadow-card">
+                    <div class="p-4 border-b border-border">
+                        <h2 class="text-lg font-semibold text-text-primary">Alertas de Inventario</h2>
+                    </div>
+                    <div id="alertsList" class="divide-y divide-border">
+                        <!-- Critical Alerts -->
+                        <div class="alert-item p-4 hover:bg-gray-50 transition-micro" data-category="critical">
+                            <div class="flex items-start space-x-4">
+                                <div class="w-10 h-10 bg-error-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                                    <i class="fas fa-exclamation-triangle text-error-500"></i>
+                                </div>
+                                <div class="flex-1 min-w-0">
+                                    <div class="flex items-center justify-between mb-1">
+                                        <h4 class="text-sm font-medium text-text-primary truncate">Queso Mozzarella</h4>
+                                        <span class="text-xs px-2 py-1 bg-error-100 text-error-700 rounded-full">CRÍTICO</span>
+                                    </div>
+                                    <div class="flex items-center justify-between mb-2">
+                                        <p class="text-sm text-text-secondary">Stock actual: 0.5 kg | Mínimo: 5 kg</p>
+                                        <span class="text-xs text-text-secondary">Hace 2 horas</span>
+                                    </div>
+                                    <div class="flex items-center space-x-2">
+                                        <button onclick="quickReorder('mozzarella', 10)" class="px-3 py-1 bg-primary-500 text-white text-xs rounded-button hover:bg-primary-600 transition-micro">
+                                            <i class="fas fa-shopping-cart mr-1"></i>Reordenar 10kg
+                                        </button>
+                                        <button onclick="adjustThreshold('mozzarella')" class="px-3 py-1 border border-border text-text-primary text-xs rounded-button hover:bg-gray-50 transition-micro">
+                                            <i class="fas fa-cog mr-1"></i>Ajustar
+                                        </button>
+                                        <button onclick="contactSupplier('lacteos-premium')" class="px-3 py-1 border border-border text-text-primary text-xs rounded-button hover:bg-gray-50 transition-micro">
+                                            <i class="fas fa-phone mr-1"></i>Proveedor
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="alert-item p-4 hover:bg-gray-50 transition-micro" data-category="critical">
+                            <div class="flex items-start space-x-4">
+                                <div class="w-10 h-10 bg-error-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                                    <i class="fas fa-exclamation-triangle text-error-500"></i>
+                                </div>
+                                <div class="flex-1 min-w-0">
+                                    <div class="flex items-center justify-between mb-1">
+                                        <h4 class="text-sm font-medium text-text-primary truncate">Masa para Pizza</h4>
+                                        <span class="text-xs px-2 py-1 bg-error-100 text-error-700 rounded-full">CRÍTICO</span>
+                                    </div>
+                                    <div class="flex items-center justify-between mb-2">
+                                        <p class="text-sm text-text-secondary">Stock actual: 2 unidades | Mínimo: 20 unidades</p>
+                                        <span class="text-xs text-text-secondary">Hace 1 hora</span>
+                                    </div>
+                                    <div class="flex items-center space-x-2">
+                                        <button onclick="quickReorder('masa-pizza', 50)" class="px-3 py-1 bg-primary-500 text-white text-xs rounded-button hover:bg-primary-600 transition-micro">
+                                            <i class="fas fa-shopping-cart mr-1"></i>Reordenar 50 unidades
+                                        </button>
+                                        <button onclick="adjustThreshold('masa-pizza')" class="px-3 py-1 border border-border text-text-primary text-xs rounded-button hover:bg-gray-50 transition-micro">
+                                            <i class="fas fa-cog mr-1"></i>Ajustar
+                                        </button>
+                                        <button onclick="contactSupplier('panaderia-central')" class="px-3 py-1 border border-border text-text-primary text-xs rounded-button hover:bg-gray-50 transition-micro">
+                                            <i class="fas fa-phone mr-1"></i>Proveedor
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Warning Alerts -->
+                        <div class="alert-item p-4 hover:bg-gray-50 transition-micro" data-category="warning">
+                            <div class="flex items-start space-x-4">
+                                <div class="w-10 h-10 bg-warning-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                                    <i class="fas fa-exclamation text-warning-500"></i>
+                                </div>
+                                <div class="flex-1 min-w-0">
+                                    <div class="flex items-center justify-between mb-1">
+                                        <h4 class="text-sm font-medium text-text-primary truncate">Pepperoni</h4>
+                                        <span class="text-xs px-2 py-1 bg-warning-100 text-warning-700 rounded-full">BAJO</span>
+                                    </div>
+                                    <div class="flex items-center justify-between mb-2">
+                                        <p class="text-sm text-text-secondary">Stock actual: 1.2 kg | Mínimo: 3 kg</p>
+                                        <span class="text-xs text-text-secondary">Hace 3 horas</span>
+                                    </div>
+                                    <div class="flex items-center space-x-2">
+                                        <button onclick="quickReorder('pepperoni', 5)" class="px-3 py-1 bg-warning-500 text-white text-xs rounded-button hover:bg-warning-600 transition-micro">
+                                            <i class="fas fa-shopping-cart mr-1"></i>Reordenar 5kg
+                                        </button>
+                                        <button onclick="adjustThreshold('pepperoni')" class="px-3 py-1 border border-border text-text-primary text-xs rounded-button hover:bg-gray-50 transition-micro">
+                                            <i class="fas fa-cog mr-1"></i>Ajustar
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="alert-item p-4 hover:bg-gray-50 transition-micro" data-category="warning">
+                            <div class="flex items-start space-x-4">
+                                <div class="w-10 h-10 bg-warning-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                                    <i class="fas fa-exclamation text-warning-500"></i>
+                                </div>
+                                <div class="flex-1 min-w-0">
+                                    <div class="flex items-center justify-between mb-1">
+                                        <h4 class="text-sm font-medium text-text-primary truncate">Coca Cola</h4>
+                                        <span class="text-xs px-2 py-1 bg-warning-100 text-warning-700 rounded-full">BAJO</span>
+                                    </div>
+                                    <div class="flex items-center justify-between mb-2">
+                                        <p class="text-sm text-text-secondary">Stock actual: 8 unidades | Mínimo: 24 unidades</p>
+                                        <span class="text-xs text-text-secondary">Hace 4 horas</span>
+                                    </div>
+                                    <div class="flex items-center space-x-2">
+                                        <button onclick="quickReorder('coca-cola', 48)" class="px-3 py-1 bg-warning-500 text-white text-xs rounded-button hover:bg-warning-600 transition-micro">
+                                            <i class="fas fa-shopping-cart mr-1"></i>Reordenar 48 latas
+                                        </button>
+                                        <button onclick="adjustThreshold('coca-cola')" class="px-3 py-1 border border-border text-text-primary text-xs rounded-button hover:bg-gray-50 transition-micro">
+                                            <i class="fas fa-cog mr-1"></i>Ajustar
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Expiring Alerts -->
+                        <div class="alert-item p-4 hover:bg-gray-50 transition-micro" data-category="expiring">
+                            <div class="flex items-start space-x-4">
+                                <div class="w-10 h-10 bg-accent-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                                    <i class="fas fa-clock text-accent-500"></i>
+                                </div>
+                                <div class="flex-1 min-w-0">
+                                    <div class="flex items-center justify-between mb-1">
+                                        <h4 class="text-sm font-medium text-text-primary truncate">Champiñones</h4>
+                                        <span class="text-xs px-2 py-1 bg-accent-100 text-accent-700 rounded-full">VENCE EN 5 DÍAS</span>
+                                    </div>
+                                    <div class="flex items-center justify-between mb-2">
+                                        <p class="text-sm text-text-secondary">Stock actual: 2.5 kg | Vence: 27/10/2025</p>
+                                        <span class="text-xs text-text-secondary">Hace 6 horas</span>
+                                    </div>
+                                    <div class="flex items-center space-x-2">
+                                        <button onclick="useFirst('champinones')" class="px-3 py-1 bg-accent-500 text-white text-xs rounded-button hover:bg-accent-600 transition-micro">
+                                            <i class="fas fa-arrow-up mr-1"></i>Usar primero
+                                        </button>
+                                        <button onclick="markDiscount('champinones')" class="px-3 py-1 border border-border text-text-primary text-xs rounded-button hover:bg-gray-50 transition-micro">
+                                            <i class="fas fa-percent mr-1"></i>Descuento
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column - Reorder Center & Analytics -->
+            <div class="lg:col-span-1 space-y-6">
+                <!-- Automated Reorder Section -->
+                <div class="bg-white rounded-lg shadow-card">
+                    <div class="p-4 border-b border-border">
+                        <h3 class="text-lg font-semibold text-text-primary">Reórdenes Automáticas</h3>
+                    </div>
+                    <div class="p-4 space-y-4">
+                        <div class="p-3 bg-success-50 border border-success-200 rounded-lg">
+                            <div class="flex items-center justify-between mb-2">
+                                <h4 class="text-sm font-medium text-success-800">Queso Mozzarella</h4>
+                                <span class="text-xs px-2 py-1 bg-success-200 text-success-800 rounded-full">PROCESANDO</span>
+                            </div>
+                            <p class="text-xs text-success-600 mb-2">15 kg • Proveedor: Lácteos Premium</p>
+                            <div class="flex items-center justify-between">
+                                <span class="text-xs text-success-600">Entrega estimada: 25/10/2025</span>
+                                <button onclick="trackOrder('ORD-001')" class="text-xs text-success-700 hover:text-success-800">
+                                    <i class="fas fa-external-link-alt mr-1"></i>Rastrear
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="p-3 bg-primary-50 border border-primary-200 rounded-lg">
+                            <div class="flex items-center justify-between mb-2">
+                                <h4 class="text-sm font-medium text-primary-800">Masa para Pizza</h4>
+                                <span class="text-xs px-2 py-1 bg-primary-200 text-primary-800 rounded-full">APROBADA</span>
+                            </div>
+                            <p class="text-xs text-primary-600 mb-2">100 unidades • Proveedor: Panadería Central</p>
+                            <div class="flex items-center justify-between">
+                                <span class="text-xs text-primary-600">Entrega estimada: 24/10/2025</span>
+                                <button onclick="trackOrder('ORD-002')" class="text-xs text-primary-700 hover:text-primary-800">
+                                    <i class="fas fa-external-link-alt mr-1"></i>Rastrear
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="text-center pt-2">
+                            <button onclick="viewAllReorders()" class="text-sm text-primary-500 hover:text-primary-600 transition-micro">
+                                Ver todas las reórdenes <i class="fas fa-arrow-right ml-1"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Supplier Management -->
+                <div class="bg-white rounded-lg shadow-card">
+                    <div class="p-4 border-b border-border">
+                        <h3 class="text-lg font-semibold text-text-primary">Proveedores</h3>
+                    </div>
+                    <div class="p-4 space-y-3">
+                        <div class="flex items-center justify-between p-2 hover:bg-gray-50 rounded-lg transition-micro">
+                            <div class="flex items-center space-x-3">
+                                <div class="w-8 h-8 bg-success-100 rounded-lg flex items-center justify-center">
+                                    <i class="fas fa-check text-success-500 text-xs"></i>
+                                </div>
+                                <div>
+                                    <h4 class="text-sm font-medium text-text-primary">Lácteos Premium</h4>
+                                    <p class="text-xs text-text-secondary">Quesos, lácteos</p>
+                                </div>
+                            </div>
+                            <button onclick="contactSupplier('lacteos-premium')" class="text-primary-500 hover:text-primary-600">
+                                <i class="fas fa-phone text-sm"></i>
+                            </button>
+                        </div>
+
+                        <div class="flex items-center justify-between p-2 hover:bg-gray-50 rounded-lg transition-micro">
+                            <div class="flex items-center space-x-3">
+                                <div class="w-8 h-8 bg-warning-100 rounded-lg flex items-center justify-center">
+                                    <i class="fas fa-clock text-warning-500 text-xs"></i>
+                                </div>
+                                <div>
+                                    <h4 class="text-sm font-medium text-text-primary">Carnes Selectas</h4>
+                                    <p class="text-xs text-text-secondary">Pepperoni, carnes</p>
+                                </div>
+                            </div>
+                            <button onclick="contactSupplier('carnes-selectas')" class="text-primary-500 hover:text-primary-600">
+                                <i class="fas fa-phone text-sm"></i>
+                            </button>
+                        </div>
+
+                        <div class="flex items-center justify-between p-2 hover:bg-gray-50 rounded-lg transition-micro">
+                            <div class="flex items-center space-x-3">
+                                <div class="w-8 h-8 bg-success-100 rounded-lg flex items-center justify-center">
+                                    <i class="fas fa-check text-success-500 text-xs"></i>
+                                </div>
+                                <div>
+                                    <h4 class="text-sm font-medium text-text-primary">Bebidas Distribuidora</h4>
+                                    <p class="text-xs text-text-secondary">Refrescos, jugos</p>
+                                </div>
+                            </div>
+                            <button onclick="contactSupplier('bebidas-distribuidora')" class="text-primary-500 hover:text-primary-600">
+                                <i class="fas fa-phone text-sm"></i>
+                            </button>
+                        </div>
+
+                        <div class="text-center pt-2">
+                            <button onclick="manageSuppliers()" class="text-sm text-primary-500 hover:text-primary-600 transition-micro">
+                                Gestionar proveedores <i class="fas fa-arrow-right ml-1"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Usage Analytics -->
+                <div class="bg-white rounded-lg shadow-card">
+                    <div class="p-4 border-b border-border">
+                        <h3 class="text-lg font-semibold text-text-primary">Analytics de Consumo</h3>
+                    </div>
+                    <div class="p-4 space-y-4">
+                        <div>
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="text-sm text-text-primary">Queso Mozzarella</span>
+                                <span class="text-sm text-data">2.5 kg/día</span>
+                            </div>
+                            <div class="w-full bg-gray-200 rounded-full h-2">
+                                <div class="bg-primary-500 h-2 rounded-full" style="width: 85%"></div>
+                            </div>
+                            <p class="text-xs text-text-secondary mt-1">Tendencia: +15% vs. semana anterior</p>
+                        </div>
+
+                        <div>
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="text-sm text-text-primary">Masa para Pizza</span>
+                                <span class="text-sm text-data">12 unidades/día</span>
+                            </div>
+                            <div class="w-full bg-gray-200 rounded-full h-2">
+                                <div class="bg-success-500 h-2 rounded-full" style="width: 70%"></div>
+                            </div>
+                            <p class="text-xs text-text-secondary mt-1">Tendencia: +8% vs. semana anterior</p>
+                        </div>
+
+                        <div>
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="text-sm text-text-primary">Pepperoni</span>
+                                <span class="text-sm text-data">1.1 kg/día</span>
+                            </div>
+                            <div class="w-full bg-gray-200 rounded-full h-2">
+                                <div class="bg-warning-500 h-2 rounded-full" style="width: 60%"></div>
+                            </div>
+                            <p class="text-xs text-text-secondary mt-1">Tendencia: -5% vs. semana anterior</p>
+                        </div>
+
+                        <div class="text-center pt-2">
+                            <button onclick="viewDetailedAnalytics()" class="text-sm text-primary-500 hover:text-primary-600 transition-micro">
+                                Analytics detallados <i class="fas fa-arrow-right ml-1"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Bulk Reorder Modal -->
+    <div id="bulkReorderModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+        <div class="bg-white rounded-lg p-6 w-full max-w-2xl mx-4 max-h-[90vh] overflow-y-auto shadow-floating">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-lg font-semibold text-text-primary">Reorden Masivo</h3>
+                <button onclick="closeBulkReorderModal()" class="text-text-secondary hover:text-text-primary transition-micro">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+
+            <div class="space-y-4">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="border border-border rounded-lg p-4">
+                        <label class="flex items-center">
+                            <input type="checkbox" class="mr-3" checked>
+                            <div class="flex-1">
+                                <h4 class="text-sm font-medium text-text-primary">Queso Mozzarella</h4>
+                                <p class="text-xs text-text-secondary">Stock: 0.5 kg | Sugerido: 15 kg</p>
+                                <div class="flex items-center space-x-2 mt-2">
+                                    <label class="text-xs text-text-secondary">Cantidad:</label>
+                                    <input type="number" value="15" class="w-20 px-2 py-1 border border-border rounded text-sm">
+                                    <span class="text-xs text-text-secondary">kg</span>
+                                </div>
+                            </div>
+                        </label>
+                    </div>
+
+                    <div class="border border-border rounded-lg p-4">
+                        <label class="flex items-center">
+                            <input type="checkbox" class="mr-3" checked>
+                            <div class="flex-1">
+                                <h4 class="text-sm font-medium text-text-primary">Masa para Pizza</h4>
+                                <p class="text-xs text-text-secondary">Stock: 2 unidades | Sugerido: 100 unidades</p>
+                                <div class="flex items-center space-x-2 mt-2">
+                                    <label class="text-xs text-text-secondary">Cantidad:</label>
+                                    <input type="number" value="100" class="w-20 px-2 py-1 border border-border rounded text-sm">
+                                    <span class="text-xs text-text-secondary">unidades</span>
+                                </div>
+                            </div>
+                        </label>
+                    </div>
+
+                    <div class="border border-border rounded-lg p-4">
+                        <label class="flex items-center">
+                            <input type="checkbox" class="mr-3">
+                            <div class="flex-1">
+                                <h4 class="text-sm font-medium text-text-primary">Pepperoni</h4>
+                                <p class="text-xs text-text-secondary">Stock: 1.2 kg | Sugerido: 8 kg</p>
+                                <div class="flex items-center space-x-2 mt-2">
+                                    <label class="text-xs text-text-secondary">Cantidad:</label>
+                                    <input type="number" value="8" class="w-20 px-2 py-1 border border-border rounded text-sm">
+                                    <span class="text-xs text-text-secondary">kg</span>
+                                </div>
+                            </div>
+                        </label>
+                    </div>
+
+                    <div class="border border-border rounded-lg p-4">
+                        <label class="flex items-center">
+                            <input type="checkbox" class="mr-3">
+                            <div class="flex-1">
+                                <h4 class="text-sm font-medium text-text-primary">Coca Cola</h4>
+                                <p class="text-xs text-text-secondary">Stock: 8 latas | Sugerido: 72 latas</p>
+                                <div class="flex items-center space-x-2 mt-2">
+                                    <label class="text-xs text-text-secondary">Cantidad:</label>
+                                    <input type="number" value="72" class="w-20 px-2 py-1 border border-border rounded text-sm">
+                                    <span class="text-xs text-text-secondary">latas</span>
+                                </div>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="border-t border-border pt-4">
+                    <div class="flex items-center justify-between mb-4">
+                        <span class="text-sm font-medium text-text-primary">Total estimado:</span>
+                        <span class="text-lg font-bold text-primary-600">$245.50</span>
+                    </div>
+                    <div class="flex space-x-3">
+                        <button onclick="processBulkReorder()" class="flex-1 bg-primary-500 text-white py-2 rounded-button font-medium hover:bg-primary-600 transition-micro">
+                            <i class="fas fa-shopping-cart mr-2"></i>Procesar Reórdenes
+                        </button>
+                        <button onclick="closeBulkReorderModal()" class="flex-1 border border-border text-text-primary py-2 rounded-button hover:bg-gray-50 transition-micro">
+                            Cancelar
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Threshold Adjustment Modal -->
+    <div id="thresholdModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+        <div class="bg-white rounded-lg p-6 w-full max-w-md mx-4 shadow-floating">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-lg font-semibold text-text-primary">Ajustar Umbral</h3>
+                <button onclick="closeThresholdModal()" class="text-text-secondary hover:text-text-primary transition-micro">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-text-primary mb-2">Ingrediente</label>
+                    <input type="text" id="ingredientName" readonly class="w-full px-3 py-2 border border-border rounded-button bg-gray-50">
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-text-primary mb-2">Stock Actual</label>
+                    <input type="text" id="currentStock" readonly class="w-full px-3 py-2 border border-border rounded-button bg-gray-50">
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-text-primary mb-2">Umbral Mínimo</label>
+                    <input type="number" id="minThreshold" step="0.1" class="w-full px-3 py-2 border border-border rounded-button focus:outline-none focus:ring-2 focus:ring-primary-500">
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-text-primary mb-2">Umbral de Reorden</label>
+                    <input type="number" id="reorderThreshold" step="0.1" class="w-full px-3 py-2 border border-border rounded-button focus:outline-none focus:ring-2 focus:ring-primary-500">
+                </div>
+
+                <div class="flex space-x-3 pt-4">
+                    <button onclick="updateThreshold()" class="flex-1 bg-primary-500 text-white py-2 rounded-button font-medium hover:bg-primary-600 transition-micro">
+                        Actualizar
+                    </button>
+                    <button onclick="closeThresholdModal()" class="flex-1 border border-border text-text-primary py-2 rounded-button hover:bg-gray-50 transition-micro">
+                        Cancelar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global variables
+        let currentIngredient = null;
+
+        // Initialize inventory system with ingredients for each menu item
+        let inventorySystem = {
+            ingredients: {
+                'mozzarella': { current: 0.5, min: 5, reorder: 10, unit: 'kg', cost: 8.50 },
+                'masa-pizza': { current: 2, min: 20, reorder: 50, unit: 'unidades', cost: 0.45 },
+                'pepperoni': { current: 1.2, min: 3, reorder: 8, unit: 'kg', cost: 12.00 },
+                'champinones': { current: 2.5, min: 2, reorder: 5, unit: 'kg', cost: 6.00, expiry: '2025-10-27' },
+                'salsa-tomate': { current: 1.8, min: 3, reorder: 10, unit: 'litros', cost: 3.20 },
+                'salsa-blanca': { current: 0.8, min: 2, reorder: 5, unit: 'litros', cost: 4.50 },
+                'pollo': { current: 3.2, min: 2, reorder: 5, unit: 'kg', cost: 7.80 },
+                'cebolla': { current: 2.1, min: 1.5, reorder: 3, unit: 'kg', cost: 2.30 },
+                'jamon': { current: 1.5, min: 2, reorder: 4, unit: 'kg', cost: 9.20 },
+                'pina': { current: 1.2, min: 1, reorder: 2, unit: 'kg', cost: 3.50 },
+                'coca-cola': { current: 8, min: 24, reorder: 72, unit: 'latas', cost: 0.85 },
+                'agua': { current: 15, min: 12, reorder: 48, unit: 'botellas', cost: 0.45 },
+                'jugo-naranja': { current: 6, min: 12, reorder: 24, unit: 'botellas', cost: 1.20 },
+                'carne-gyro': { current: 2.8, min: 2, reorder: 5, unit: 'kg', cost: 8.90 },
+                'salchicha': { current: 1.9, min: 2, reorder: 5, unit: 'kg', cost: 5.40 }
+            },
+
+            // Recipe definitions - what ingredients each menu item uses
+            recipes: {
+                'Whankoos 440': {
+                    'P': { 'masa-pizza': 1, 'salsa-tomate': 0.08, 'mozzarella': 0.12, 'pepperoni': 0.05, 'champinones': 0.03 },
+                    'M': { 'masa-pizza': 1, 'salsa-tomate': 0.12, 'mozzarella': 0.18, 'pepperoni': 0.08, 'champinones': 0.05 },
+                    'G': { 'masa-pizza': 1, 'salsa-tomate': 0.16, 'mozzarella': 0.25, 'pepperoni': 0.12, 'champinones': 0.08 }
+                },
+                'Chicken Cream': {
+                    'P': { 'masa-pizza': 1, 'salsa-blanca': 0.08, 'mozzarella': 0.12, 'pollo': 0.08, 'cebolla': 0.03 },
+                    'M': { 'masa-pizza': 1, 'salsa-blanca': 0.12, 'mozzarella': 0.18, 'pollo': 0.12, 'cebolla': 0.05 },
+                    'G': { 'masa-pizza': 1, 'salsa-blanca': 0.16, 'mozzarella': 0.25, 'pollo': 0.18, 'cebolla': 0.08 }
+                },
+                'Pepperoni': {
+                    'P': { 'masa-pizza': 1, 'salsa-tomate': 0.08, 'mozzarella': 0.10, 'pepperoni': 0.06 },
+                    'M': { 'masa-pizza': 1, 'salsa-tomate': 0.12, 'mozzarella': 0.15, 'pepperoni': 0.09 },
+                    'G': { 'masa-pizza': 1, 'salsa-tomate': 0.16, 'mozzarella': 0.22, 'pepperoni': 0.14 }
+                },
+                'Hawaiana': {
+                    'P': { 'masa-pizza': 1, 'salsa-tomate': 0.08, 'mozzarella': 0.10, 'jamon': 0.05, 'pina': 0.04 },
+                    'M': { 'masa-pizza': 1, 'salsa-tomate': 0.12, 'mozzarella': 0.15, 'jamon': 0.08, 'pina': 0.06 },
+                    'G': { 'masa-pizza': 1, 'salsa-tomate': 0.16, 'mozzarella': 0.22, 'jamon': 0.12, 'pina': 0.09 }
+                },
+                'Coca Cola': { 'coca-cola': 1 },
+                'Agua': { 'agua': 1 },
+                'Jugo Naranja': { 'jugo-naranja': 1 },
+                'Gyro': { 'carne-gyro': 0.15, 'cebolla': 0.02 },
+                'Whankidog': { 'salchicha': 0.12, 'cebolla': 0.01 }
+            }
+        };
+
+        // Mobile menu toggle
+        function toggleMobileMenu() {
+            const menu = document.getElementById('mobileMenu');
+            menu.classList.toggle('hidden');
+        }
+
+        // Alert filtering
+        function filterAlerts(category) {
+            // Update filter buttons
+            document.querySelectorAll('.alert-filter').forEach(btn => {
+                btn.classList.remove('bg-primary-500', 'text-white');
+                btn.classList.add('border', 'text-' + (btn.dataset.filter === 'all' ? 'primary' : 
+                    btn.dataset.filter === 'critical' ? 'error' : 
+                    btn.dataset.filter === 'warning' ? 'warning' : 'accent') + '-500');
+            });
+            
+            const activeButton = document.querySelector(`[data-filter="${category}"]`);
+            activeButton.classList.remove('border');
+            activeButton.classList.remove('text-primary-500', 'text-error-500', 'text-warning-500', 'text-accent-500');
+            activeButton.classList.add('bg-primary-500', 'text-white');
+            
+            // Show/hide alerts
+            document.querySelectorAll('.alert-item').forEach(item => {
+                if (category === 'all' || item.dataset.category === category) {
+                    item.style.display = 'block';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+        }
+
+        // Quick reorder function
+        function quickReorder(ingredient, quantity) {
+            const ingredientData = inventorySystem.ingredients[ingredient];
+            if (!ingredientData) return;
+
+            const cost = ingredientData.cost * quantity;
+            const confirmation = confirm(
+                `¿Confirmar reorden?\n\n` +
+                `Ingrediente: ${ingredient}\n` +
+                `Cantidad: ${quantity} ${ingredientData.unit}\n` +
+                `Costo estimado: $${cost.toFixed(2)}`
+            );
+
+            if (confirmation) {
+                // Simulate order processing
+                alert(`Reorden procesada:\n${quantity} ${ingredientData.unit} de ${ingredient}\nCosto: $${cost.toFixed(2)}`);
+                
+                // Update reorder count
+                const reorderCount = document.getElementById('activeReorders');
+                reorderCount.textContent = parseInt(reorderCount.textContent) + 1;
+            }
+        }
+
+        // Threshold adjustment
+        function adjustThreshold(ingredient) {
+            const ingredientData = inventorySystem.ingredients[ingredient];
+            if (!ingredientData) return;
+
+            currentIngredient = ingredient;
+            
+            document.getElementById('ingredientName').value = ingredient;
+            document.getElementById('currentStock').value = `${ingredientData.current} ${ingredientData.unit}`;
+            document.getElementById('minThreshold').value = ingredientData.min;
+            document.getElementById('reorderThreshold').value = ingredientData.reorder;
+            
+            document.getElementById('thresholdModal').classList.remove('hidden');
+            document.getElementById('thresholdModal').classList.add('flex');
+        }
+
+        function closeThresholdModal() {
+            document.getElementById('thresholdModal').classList.add('hidden');
+            document.getElementById('thresholdModal').classList.remove('flex');
+            currentIngredient = null;
+        }
+
+        function updateThreshold() {
+            if (!currentIngredient) return;
+
+            const minThreshold = parseFloat(document.getElementById('minThreshold').value);
+            const reorderThreshold = parseFloat(document.getElementById('reorderThreshold').value);
+
+            inventorySystem.ingredients[currentIngredient].min = minThreshold;
+            inventorySystem.ingredients[currentIngredient].reorder = reorderThreshold;
+
+            alert(`Umbrales actualizados para ${currentIngredient}`);
+            closeThresholdModal();
+        }
+
+        // Supplier contact
+        function contactSupplier(supplierId) {
+            const suppliers = {
+                'lacteos-premium': { name: 'Lácteos Premium', phone: '+58-212-555-0101', email: 'pedidos@lacteospremium.com' },
+                'panaderia-central': { name: 'Panadería Central', phone: '+58-212-555-0102', email: 'ventas@panaderiacentral.com' },
+                'carnes-selectas': { name: 'Carnes Selectas', phone: '+58-212-555-0103', email: 'info@carnesselectas.com' },
+                'bebidas-distribuidora': { name: 'Bebidas Distribuidora', phone: '+58-212-555-0104', email: 'pedidos@bebidasdist.com' }
+            };
+
+            const supplier = suppliers[supplierId];
+            if (supplier) {
+                alert(`Contactar a ${supplier.name}\nTeléfono: ${supplier.phone}\nEmail: ${supplier.email}`);
+            }
+        }
+
+        // Bulk reorder modal
+        function openBulkReorderModal() {
+            document.getElementById('bulkReorderModal').classList.remove('hidden');
+            document.getElementById('bulkReorderModal').classList.add('flex');
+        }
+
+        function closeBulkReorderModal() {
+            document.getElementById('bulkReorderModal').classList.add('hidden');
+            document.getElementById('bulkReorderModal').classList.remove('flex');
+        }
+
+        function processBulkReorder() {
+            const checkedItems = document.querySelectorAll('#bulkReorderModal input[type="checkbox"]:checked');
+            let totalCost = 0;
+            let orderSummary = 'Reórdenes procesadas:\n\n';
+
+            checkedItems.forEach(checkbox => {
+                const itemDiv = checkbox.closest('.border');
+                const title = itemDiv.querySelector('h4').textContent;
+                const quantityInput = itemDiv.querySelector('input[type="number"]');
+                const quantity = parseInt(quantityInput.value);
+                
+                // Calculate cost (simplified)
+                const ingredientKey = title.toLowerCase().replace(' ', '-').replace('ó', 'o');
+                const ingredientData = inventorySystem.ingredients[ingredientKey];
+                if (ingredientData) {
+                    const cost = ingredientData.cost * quantity;
+                    totalCost += cost;
+                    orderSummary += `• ${title}: ${quantity} ${ingredientData.unit} ($${cost.toFixed(2)})\n`;
+                }
+            });
+
+            orderSummary += `\nTotal: $${totalCost.toFixed(2)}`;
+            alert(orderSummary);
+            
+            closeBulkReorderModal();
+            
+            // Update reorder count
+            const reorderCount = document.getElementById('activeReorders');
+            reorderCount.textContent = parseInt(reorderCount.textContent) + checkedItems.length;
+        }
+
+        // Other functions
+        function refreshAlerts() {
+            alert('Alertas actualizadas');
+            location.reload();
+        }
+
+        function useFirst(ingredient) {
+            alert(`Marcado para usar primero: ${ingredient}`);
+        }
+
+        function markDiscount(ingredient) {
+            alert(`Aplicando descuento a: ${ingredient}`);
+        }
+
+        function trackOrder(orderId) {
+            alert(`Rastreando orden: ${orderId}\nEstado: En tránsito\nEntrega estimada: 24-25 Oct 2025`);
+        }
+
+        function viewAllReorders() {
+            alert('Redirigiendo a la vista completa de reórdenes...');
+        }
+
+        function manageSuppliers() {
+            alert('Redirigiendo al gestor de proveedores...');
+        }
+
+        function viewDetailedAnalytics() {
+            alert('Redirigiendo a analytics detallados...');
+        }
+
+        // Function to reduce inventory when orders are processed (integration with POS)
+        function reduceInventoryForOrder(orderItems) {
+            orderItems.forEach(item => {
+                const recipe = inventorySystem.recipes[item.name];
+                if (recipe) {
+                    let recipeData = recipe;
+                    
+                    // For pizzas with sizes, get the specific size recipe
+                    if (item.size && recipe[item.size]) {
+                        recipeData = recipe[item.size];
+                    }
+                    
+                    // Reduce ingredients based on quantity ordered
+                    Object.keys(recipeData).forEach(ingredient => {
+                        const requiredAmount = recipeData[ingredient] * item.quantity;
+                        if (inventorySystem.ingredients[ingredient]) {
+                            inventorySystem.ingredients[ingredient].current -= requiredAmount;
+                            
+                            // Ensure stock doesn't go negative
+                            if (inventorySystem.ingredients[ingredient].current < 0) {
+                                inventorySystem.ingredients[ingredient].current = 0;
+                            }
+                        }
+                    });
+                }
+            });
+
+            // Save updated inventory to localStorage
+            localStorage.setItem('whankoos_inventory_system', JSON.stringify(inventorySystem));
+            
+            // Check for new alerts after inventory reduction
+            checkForNewAlerts();
+        }
+
+        // Function to check for new alerts after inventory changes
+        function checkForNewAlerts() {
+            let newAlerts = [];
+            
+            Object.keys(inventorySystem.ingredients).forEach(ingredient => {
+                const data = inventorySystem.ingredients[ingredient];
+                if (data.current <= 0) {
+                    newAlerts.push({ type: 'critical', ingredient, message: 'Stock agotado' });
+                } else if (data.current <= data.min) {
+                    newAlerts.push({ type: 'warning', ingredient, message: 'Stock bajo' });
+                }
+            });
+
+            if (newAlerts.length > 0) {
+                console.log('Nuevas alertas generadas:', newAlerts);
+                // Here you would typically update the UI or send notifications
+            }
+        }
+
+        // Listen for orders processed from the POS system
+        function initializeInventoryIntegration() {
+            // Check for processed orders from POS
+            const checkForOrders = setInterval(() => {
+                const processedOrder = localStorage.getItem('whankoos_order_processed');
+                if (processedOrder) {
+                    const orderData = JSON.parse(processedOrder);
+                    reduceInventoryForOrder(orderData.items);
+                    
+                    // Clear the processed order flag
+                    localStorage.removeItem('whankoos_order_processed');
+                    
+                    console.log('Inventario actualizado después del pedido:', orderData);
+                }
+            }, 1000); // Check every second
+
+            // Load saved inventory if available
+            const savedInventory = localStorage.getItem('whankoos_inventory_system');
+            if (savedInventory) {
+                inventorySystem = JSON.parse(savedInventory);
+            }
+        }
+
+        // Initialize when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeInventoryIntegration();
+        });
+    </script>
+<script id="dhws-dataInjector" src="../public/dhws-data-injector.js"></script>
+</body>
+</html>

@@ -1,0 +1,877 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Whankoos POS Pro - Gestión de Pedidos</title>
+    <link rel="stylesheet" href="../css/main.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  
+  <script type="module" src="https://static.rocket.new/rocket-web.js?_cfg=https%3A%2F%2Fwhankoosp1201back.builtwithrocket.new&_be=https%3A%2F%2Fapplication.rocket.new&_v=0.1.9"></script>
+  <script type="module" src="https://static.rocket.new/rocket-shot.js?v=0.0.1"></script>
+  </head>
+<body class="bg-background min-h-screen">
+    <!-- Header -->
+    <header class="bg-white shadow-card border-b border-border">
+        <div class="max-w-full mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <!-- Logo -->
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 bg-gradient-to-br from-primary-500 to-secondary-600 rounded-lg flex items-center justify-center">
+                        <i class="fas fa-pizza-slice text-white text-lg"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-xl font-bold text-text-primary">Whankoos POS Pro</h1>
+                        <p class="text-sm text-text-secondary">Gestión de Pedidos</p>
+                    </div>
+                </div>
+
+                <!-- Navigation -->
+                <nav class="hidden md:flex items-center space-x-4">
+                    <a href="main_pos_dashboard.html" class="px-4 py-2 text-text-secondary hover:text-primary-500 transition-micro">
+                        <i class="fas fa-home mr-2"></i>Dashboard
+                    </a>
+                    <a href="exchange_rate_management.html" class="px-4 py-2 text-text-secondary hover:text-primary-500 transition-micro">
+                        <i class="fas fa-exchange-alt mr-2"></i>Tasas
+                    </a>
+                    <a href="sales_history_analytics.html" class="px-4 py-2 text-text-secondary hover:text-primary-500 transition-micro">
+                        <i class="fas fa-chart-line mr-2"></i>Ventas
+                    </a>
+                    <a href="table_zone_management.html" class="px-4 py-2 text-text-secondary hover:text-primary-500 transition-micro">
+                        <i class="fas fa-table mr-2"></i>Mesas
+                    </a>
+                    <a href="order_cart_management.html" class="px-4 py-2 bg-primary-500 text-white rounded-button font-medium">
+                        <i class="fas fa-shopping-cart mr-2"></i>Pedidos
+                    </a>
+                </nav>
+
+                <!-- Mobile Menu Button -->
+                <button class="md:hidden p-2 text-text-secondary hover:text-primary-500" onclick="toggleMobileMenu()">
+                    <i class="fas fa-bars text-xl"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Mobile Navigation -->
+        <div id="mobileMenu" class="hidden md:hidden bg-white border-t border-border">
+            <div class="px-4 py-2 space-y-2">
+                <a href="main_pos_dashboard.html" class="block px-4 py-2 text-text-secondary hover:text-primary-500 transition-micro">
+                    <i class="fas fa-home mr-2"></i>Dashboard
+                </a>
+                <a href="exchange_rate_management.html" class="block px-4 py-2 text-text-secondary hover:text-primary-500 transition-micro">
+                    <i class="fas fa-exchange-alt mr-2"></i>Tasas de Cambio
+                </a>
+                <a href="sales_history_analytics.html" class="block px-4 py-2 text-text-secondary hover:text-primary-500 transition-micro">
+                    <i class="fas fa-chart-line mr-2"></i>Historial de Ventas
+                </a>
+                <a href="table_zone_management.html" class="block px-4 py-2 text-text-secondary hover:text-primary-500 transition-micro">
+                    <i class="fas fa-table mr-2"></i>Gestión de Mesas
+                </a>
+                <a href="order_cart_management.html" class="block px-4 py-2 bg-primary-500 text-white rounded-button font-medium">
+                    <i class="fas fa-shopping-cart mr-2"></i>Gestión de Pedidos
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="flex-1 p-4 lg:p-6">
+        <div class="max-w-7xl mx-auto">
+            <!-- Page Header -->
+            <div class="mb-6">
+                <h2 class="text-2xl font-bold text-text-primary mb-2">Gestión de Pedidos</h2>
+                <p class="text-text-secondary">Administra el carrito de compras, asocia mesas y procesa pagos</p>
+            </div>
+
+            <!-- Currency Display -->
+            <div class="bg-white shadow-card rounded-lg p-4 mb-6 border border-border">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center space-x-4">
+                        <div class="flex items-center space-x-2">
+                            <i class="fas fa-exchange-alt text-primary-500"></i>
+                            <span class="font-medium text-text-primary">Tasas de Cambio:</span>
+                        </div>
+                        <div class="flex space-x-4 text-sm">
+                            <span class="text-data">USD 1.00</span>
+                            <span class="text-data">Bs <span id="bsRate">45.50</span></span>
+                            <span class="text-data">COP <span id="copRate">4250</span></span>
+                        </div>
+                    </div>
+                    <button onclick="openRateModal()" class="text-primary-500 hover:text-primary-600 transition-micro px-3 py-1 border border-primary-500 rounded-button">
+                        <i class="fas fa-edit mr-2"></i>Editar
+                    </button>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <!-- Quick Menu Panel -->
+                <div class="lg:col-span-1">
+                    <div class="bg-white shadow-card rounded-lg border border-border">
+                        <div class="p-4 border-b border-border">
+                            <h3 class="text-lg font-semibold text-text-primary">Menú Rápido</h3>
+                        </div>
+                        <div class="p-4 max-h-96 overflow-y-auto">
+                            <!-- Popular Items -->
+                            <div class="mb-4">
+                                <h4 class="font-medium text-text-primary mb-3 flex items-center">
+                                    <i class="fas fa-star text-warning-500 mr-2"></i>Más Populares
+                                </h4>
+                                <div class="space-y-2">
+                                    <div class="flex items-center justify-between p-2 hover:bg-primary-50 rounded-lg transition-micro cursor-pointer" onclick="addQuickItem('Whankoos 440', 'P', 8.50)">
+                                        <div class="flex items-center space-x-3">
+                                            <img src="https://images.unsplash.com/photo-1723380620249-6a949183830d" 
+                                                 alt="Pizza Whankoos 440 con ingredientes especiales" 
+                                                 class="w-8 h-8 rounded object-cover"
+                                                 onerror="this.src='https://images.unsplash.com/photo-1584824486509-112e4181ff6b?q=80&w=2940&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D'; this.onerror=null;">
+                                            <div>
+                                                <span class="text-sm font-medium">Whankoos 440 (P)</span>
+                                                <p class="text-xs text-text-secondary">$8.50</p>
+                                            </div>
+                                        </div>
+                                        <button class="bg-primary-500 text-white px-2 py-1 rounded text-xs hover:bg-primary-600 transition-micro">
+                                            <i class="fas fa-plus"></i>
+                                        </button>
+                                    </div>
+
+                                    <div class="flex items-center justify-between p-2 hover:bg-primary-50 rounded-lg transition-micro cursor-pointer" onclick="addQuickItem('Pepperoni', 'M', 11.00)">
+                                        <div class="flex items-center space-x-3">
+                                            <img src="https://images.unsplash.com/photo-1497534269299-a32b7371754a" 
+                                                 alt="Pizza Pepperoni clásica con pepperoni y queso" 
+                                                 class="w-8 h-8 rounded object-cover"
+                                                 onerror="this.src='https://images.unsplash.com/photo-1584824486509-112e4181ff6b?q=80&w=2940&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D'; this.onerror=null;">
+                                            <div>
+                                                <span class="text-sm font-medium">Pepperoni (M)</span>
+                                                <p class="text-xs text-text-secondary">$11.00</p>
+                                            </div>
+                                        </div>
+                                        <button class="bg-primary-500 text-white px-2 py-1 rounded text-xs hover:bg-primary-600 transition-micro">
+                                            <i class="fas fa-plus"></i>
+                                        </button>
+                                    </div>
+
+                                    <div class="flex items-center justify-between p-2 hover:bg-primary-50 rounded-lg transition-micro cursor-pointer" onclick="addQuickItem('Coca Cola', '', 2.50)">
+                                        <div class="flex items-center space-x-3">
+                                            <img src="https://images.unsplash.com/photo-1581636625402-29b2a704ef13" 
+                                                 alt="Coca Cola refrescante" 
+                                                 class="w-8 h-8 rounded object-cover"
+                                                 onerror="this.src='https://images.unsplash.com/photo-1584824486509-112e4181ff6b?q=80&w=2940&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D'; this.onerror=null;">
+                                            <div>
+                                                <span class="text-sm font-medium">Coca Cola</span>
+                                                <p class="text-xs text-text-secondary">$2.50</p>
+                                            </div>
+                                        </div>
+                                        <button class="bg-primary-500 text-white px-2 py-1 rounded text-xs hover:bg-primary-600 transition-micro">
+                                            <i class="fas fa-plus"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Quick Actions -->
+                            <div>
+                                <h4 class="font-medium text-text-primary mb-3 flex items-center">
+                                    <i class="fas fa-bolt text-accent-500 mr-2"></i>Acciones Rápidas
+                                </h4>
+                                <div class="grid grid-cols-2 gap-2">
+                                    <button onclick="loadLastOrder()" class="p-2 border border-border rounded-lg text-sm hover:bg-gray-50 transition-micro">
+                                        <i class="fas fa-history mb-1"></i>
+                                        <p>Último Pedido</p>
+                                    </button>
+                                    <button onclick="loadTemplate()" class="p-2 border border-border rounded-lg text-sm hover:bg-gray-50 transition-micro">
+                                        <i class="fas fa-bookmark mb-1"></i>
+                                        <p>Plantilla</p>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Cart Management Panel -->
+                <div class="lg:col-span-2">
+                    <div class="bg-white shadow-card rounded-lg border border-border">
+                        <!-- Cart Header -->
+                        <div class="p-4 border-b border-border">
+                            <div class="flex items-center justify-between mb-3">
+                                <h3 class="text-lg font-semibold text-text-primary flex items-center">
+                                    <i class="fas fa-shopping-cart text-primary-500 mr-2"></i>Carrito de Pedidos
+                                </h3>
+                                <div class="flex space-x-2">
+                                    <button onclick="saveCart()" class="text-accent-500 hover:text-accent-600 transition-micro px-3 py-1 border border-accent-500 rounded-button text-sm">
+                                        <i class="fas fa-save mr-1"></i>Guardar
+                                    </button>
+                                    <button onclick="clearCart()" class="text-error-500 hover:text-error-600 transition-micro px-3 py-1 border border-error-500 rounded-button text-sm">
+                                        <i class="fas fa-trash mr-1"></i>Limpiar
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Table Association -->
+                            <div class="flex items-center space-x-4">
+                                <div class="flex items-center space-x-2">
+                                    <i class="fas fa-table text-accent-500"></i>
+                                    <span class="text-sm font-medium">Mesa:</span>
+                                </div>
+                                <select id="tableSelect" class="px-3 py-1 border border-border rounded-button text-sm focus:outline-none focus:ring-2 focus:ring-primary-500" onchange="selectTable()">
+                                    <option value="">Seleccionar mesa</option>
+                                    <option value="T1">Mesa T1 (Terraza)</option>
+                                    <option value="T2">Mesa T2 (Terraza)</option>
+                                    <option value="T3">Mesa T3 (Terraza)</option>
+                                    <option value="T4">Mesa T4 (Terraza)</option>
+                                    <option value="P1-1">Mesa P1-1 (Piso 1)</option>
+                                    <option value="P1-2">Mesa P1-2 (Piso 1)</option>
+                                    <option value="P1-3">Mesa P1-3 (Piso 1)</option>
+                                    <option value="P1-4">Mesa P1-4 (Piso 1)</option>
+                                    <option value="P1-5">Mesa P1-5 (Piso 1)</option>
+                                    <option value="P2-1">Mesa P2-1 (Piso 2)</option>
+                                    <option value="P2-2">Mesa P2-2 (Piso 2)</option>
+                                    <option value="P2-3">Mesa P2-3 (Piso 2)</option>
+                                    <option value="P2-4">Mesa P2-4 (Piso 2)</option>
+                                </select>
+                                <div id="selectedTableInfo" class="hidden bg-accent-50 px-3 py-1 rounded-button text-sm text-accent-700">
+                                    <i class="fas fa-check-circle mr-1"></i>
+                                    <span id="selectedTableName">-</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Cart Items -->
+                        <div class="p-4">
+                            <div id="cartItems" class="space-y-3 max-h-64 overflow-y-auto mb-4">
+                                <!-- Sample cart items for demonstration -->
+                                <div class="cart-item bg-surface border border-border rounded-lg p-3 animate-fade-in">
+                                    <div class="flex items-center justify-between mb-2">
+                                        <div class="flex items-center space-x-3">
+                                            <img src="https://images.unsplash.com/photo-1723380620249-6a949183830d" 
+                                                 alt="Pizza Whankoos 440 con ingredientes especiales" 
+                                                 class="w-10 h-10 rounded object-cover"
+                                                 onerror="this.src='https://images.unsplash.com/photo-1584824486509-112e4181ff6b?q=80&w=2940&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D'; this.onerror=null;">
+                                            <div>
+                                                <h4 class="font-medium text-text-primary">Whankoos 440 (P)</h4>
+                                                <p class="text-xs text-text-secondary">Masa, salsa, queso, pepperoni, champiñones</p>
+                                            </div>
+                                        </div>
+                                        <button onclick="removeCartItem(0)" class="text-error-500 hover:text-error-600 transition-micro">
+                                            <i class="fas fa-times"></i>
+                                        </button>
+                                    </div>
+                                    <div class="flex items-center justify-between">
+                                        <div class="flex items-center space-x-3">
+                                            <div class="flex items-center space-x-2">
+                                                <button onclick="decreaseQuantity(0)" class="w-7 h-7 bg-gray-200 text-text-primary rounded text-sm hover:bg-gray-300 transition-micro">-</button>
+                                                <span class="text-sm font-medium w-8 text-center">2</span>
+                                                <button onclick="increaseQuantity(0)" class="w-7 h-7 bg-primary-500 text-white rounded text-sm hover:bg-primary-600 transition-micro">+</button>
+                                            </div>
+                                            <span class="text-xs text-text-secondary">$8.50 c/u</span>
+                                        </div>
+                                        <div class="text-right">
+                                            <div class="text-sm font-medium text-data">$17.00</div>
+                                            <div class="text-xs text-text-secondary">Bs 773.50</div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="cart-item bg-surface border border-border rounded-lg p-3 animate-fade-in">
+                                    <div class="flex items-center justify-between mb-2">
+                                        <div class="flex items-center space-x-3">
+                                            <img src="https://images.unsplash.com/photo-1581636625402-29b2a704ef13" 
+                                                 alt="Coca Cola refrescante" 
+                                                 class="w-10 h-10 rounded object-cover"
+                                                 onerror="this.src='https://images.unsplash.com/photo-1584824486509-112e4181ff6b?q=80&w=2940&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D'; this.onerror=null;">
+                                            <div>
+                                                <h4 class="font-medium text-text-primary">Coca Cola</h4>
+                                                <p class="text-xs text-text-secondary">Bebida refrescante 350ml</p>
+                                            </div>
+                                        </div>
+                                        <button onclick="removeCartItem(1)" class="text-error-500 hover:text-error-600 transition-micro">
+                                            <i class="fas fa-times"></i>
+                                        </button>
+                                    </div>
+                                    <div class="flex items-center justify-between">
+                                        <div class="flex items-center space-x-3">
+                                            <div class="flex items-center space-x-2">
+                                                <button onclick="decreaseQuantity(1)" class="w-7 h-7 bg-gray-200 text-text-primary rounded text-sm hover:bg-gray-300 transition-micro">-</button>
+                                                <span class="text-sm font-medium w-8 text-center">1</span>
+                                                <button onclick="increaseQuantity(1)" class="w-7 h-7 bg-primary-500 text-white rounded text-sm hover:bg-primary-600 transition-micro">+</button>
+                                            </div>
+                                            <span class="text-xs text-text-secondary">$2.50 c/u</span>
+                                        </div>
+                                        <div class="text-right">
+                                            <div class="text-sm font-medium text-data">$2.50</div>
+                                            <div class="text-xs text-text-secondary">Bs 113.75</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Cart Summary -->
+                            <div class="border-t border-border pt-4">
+                                <div class="bg-gray-50 rounded-lg p-4">
+                                    <div class="space-y-2 mb-4">
+                                        <div class="flex justify-between text-sm">
+                                            <span>Subtotal (USD):</span>
+                                            <span id="subtotalUSD" class="text-data font-medium">$19.50</span>
+                                        </div>
+                                        <div class="flex justify-between text-sm text-text-secondary">
+                                            <span>Subtotal (Bs):</span>
+                                            <span id="subtotalBs" class="text-data">Bs 887.25</span>
+                                        </div>
+                                        <div class="flex justify-between text-sm text-text-secondary">
+                                            <span>Subtotal (COP):</span>
+                                            <span id="subtotalCOP" class="text-data">$82,875</span>
+                                        </div>
+                                        <div class="border-t border-border pt-2">
+                                            <div class="flex justify-between font-semibold text-lg">
+                                                <span>Total (USD):</span>
+                                                <span id="totalUSD" class="text-data text-primary-600">$19.50</span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Payment Actions -->
+                                    <div class="space-y-3">
+                                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                                            <button onclick="processPayment('USD')" class="bg-primary-500 text-white py-2 px-4 rounded-button font-medium hover:bg-primary-600 transition-micro">
+                                                <i class="fas fa-dollar-sign mr-2"></i>Pagar USD
+                                            </button>
+                                            <button onclick="processPayment('BS')" class="bg-success-500 text-white py-2 px-4 rounded-button font-medium hover:bg-success-600 transition-micro">
+                                                <i class="fas fa-coins mr-2"></i>Pagar Bs
+                                            </button>
+                                            <button onclick="processPayment('COP')" class="bg-accent-500 text-white py-2 px-4 rounded-button font-medium hover:bg-accent-600 transition-micro">
+                                                <i class="fas fa-peso-sign mr-2"></i>Pagar COP
+                                            </button>
+                                        </div>
+                                        
+                                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                                            <button onclick="printOrder()" class="border border-border text-text-primary py-2 px-4 rounded-button hover:bg-gray-50 transition-micro">
+                                                <i class="fas fa-print mr-2"></i>Imprimir Ticket
+                                            </button>
+                                            <button onclick="holdOrder()" class="border border-border text-text-primary py-2 px-4 rounded-button hover:bg-gray-50 transition-micro">
+                                                <i class="fas fa-pause mr-2"></i>Mantener Pedido
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Orders -->
+            <div class="mt-6">
+                <div class="bg-white shadow-card rounded-lg border border-border">
+                    <div class="p-4 border-b border-border">
+                        <h3 class="text-lg font-semibold text-text-primary flex items-center">
+                            <i class="fas fa-history text-accent-500 mr-2"></i>Pedidos Recientes
+                        </h3>
+                    </div>
+                    <div class="p-4">
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                            <!-- Recent Order 1 -->
+                            <div class="border border-border rounded-lg p-3 hover:shadow-md transition-smooth cursor-pointer" onclick="loadOrder(1)">
+                                <div class="flex items-center justify-between mb-2">
+                                    <span class="font-medium text-text-primary">Mesa T2</span>
+                                    <span class="text-xs text-success-600 bg-success-50 px-2 py-1 rounded">Completado</span>
+                                </div>
+                                <div class="text-sm text-text-secondary mb-2">
+                                    <p>2x Whankoos 440 (P), 1x Coca Cola</p>
+                                </div>
+                                <div class="flex items-center justify-between">
+                                    <span class="text-sm text-data font-medium">$19.50</span>
+                                    <span class="text-xs text-text-secondary">22/10/2025 14:30</span>
+                                </div>
+                            </div>
+
+                            <!-- Recent Order 2 -->
+                            <div class="border border-border rounded-lg p-3 hover:shadow-md transition-smooth cursor-pointer" onclick="loadOrder(2)">
+                                <div class="flex items-center justify-between mb-2">
+                                    <span class="font-medium text-text-primary">Mesa P1-2</span>
+                                    <span class="text-xs text-warning-600 bg-warning-50 px-2 py-1 rounded">En Proceso</span>
+                                </div>
+                                <div class="text-sm text-text-secondary mb-2">
+                                    <p>1x Pepperoni (G), 2x Agua</p>
+                                </div>
+                                <div class="flex items-center justify-between">
+                                    <span class="text-sm text-data font-medium">$17.50</span>
+                                    <span class="text-xs text-text-secondary">22/10/2025 14:15</span>
+                                </div>
+                            </div>
+
+                            <!-- Recent Order 3 -->
+                            <div class="border border-border rounded-lg p-3 hover:shadow-md transition-smooth cursor-pointer" onclick="loadOrder(3)">
+                                <div class="flex items-center justify-between mb-2">
+                                    <span class="font-medium text-text-primary">Mesa P2-3</span>
+                                    <span class="text-xs text-success-600 bg-success-50 px-2 py-1 rounded">Completado</span>
+                                </div>
+                                <div class="text-sm text-text-secondary mb-2">
+                                    <p>1x Hawaiana (M), 1x Jugo Naranja</p>
+                                </div>
+                                <div class="flex items-center justify-between">
+                                    <span class="text-sm text-data font-medium">$14.50</span>
+                                    <span class="text-xs text-text-secondary">22/10/2025 13:45</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Exchange Rate Modal -->
+    <div id="rateModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+        <div class="bg-white rounded-lg p-6 w-full max-w-md mx-4 shadow-floating">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-lg font-semibold text-text-primary">Editar Tasas de Cambio</h3>
+                <button onclick="closeRateModal()" class="text-text-secondary hover:text-text-primary transition-micro">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-text-primary mb-2">Bolívares (Bs) por USD</label>
+                    <input type="number" id="bsRateInput" step="0.01" class="w-full px-3 py-2 border border-border rounded-button focus:outline-none focus:ring-2 focus:ring-primary-500" value="45.50">
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-text-primary mb-2">Pesos Colombianos (COP) por USD</label>
+                    <input type="number" id="copRateInput" step="1" class="w-full px-3 py-2 border border-border rounded-button focus:outline-none focus:ring-2 focus:ring-primary-500" value="4250">
+                </div>
+
+                <div class="flex space-x-3 pt-4">
+                    <button onclick="updateRates()" class="flex-1 bg-primary-500 text-white py-2 rounded-button font-medium hover:bg-primary-600 transition-micro">
+                        Actualizar
+                    </button>
+                    <button onclick="closeRateModal()" class="flex-1 border border-border text-text-primary py-2 rounded-button hover:bg-gray-50 transition-micro">
+                        Cancelar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Payment Processing Modal -->
+    <div id="paymentModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+        <div class="bg-white rounded-lg p-6 w-full max-w-md mx-4 shadow-floating">
+            <div class="text-center mb-4">
+                <div class="w-16 h-16 bg-primary-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                    <i class="fas fa-credit-card text-primary-500 text-2xl"></i>
+                </div>
+                <h3 class="text-lg font-semibold text-text-primary">Procesando Pago</h3>
+                <p class="text-text-secondary">Mesa: <span id="paymentTable">-</span></p>
+            </div>
+
+            <div class="space-y-4">
+                <div class="bg-gray-50 rounded-lg p-4">
+                    <div class="flex justify-between items-center mb-2">
+                        <span class="font-medium">Total a Pagar:</span>
+                        <span id="paymentAmount" class="text-lg font-bold text-primary-600">$19.50</span>
+                    </div>
+                    <div class="text-sm text-text-secondary">
+                        <span>Moneda: </span><span id="paymentCurrency">USD</span>
+                    </div>
+                </div>
+
+                <div class="flex space-x-3">
+                    <button onclick="confirmPayment()" class="flex-1 bg-success-500 text-white py-3 rounded-button font-medium hover:bg-success-600 transition-micro">
+                        <i class="fas fa-check mr-2"></i>Confirmar Pago
+                    </button>
+                    <button onclick="closePaymentModal()" class="flex-1 border border-border text-text-primary py-3 rounded-button hover:bg-gray-50 transition-micro">
+                        Cancelar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global variables
+        let cart = [
+            { name: 'Whankoos 440', size: 'P', price: 8.50, quantity: 2, image: 'https://images.unsplash.com/photo-1565299624946-b28f40a0ca4b?q=80&w=400&auto=format&fit=crop' },
+            { name: 'Coca Cola', size: '', price: 2.50, quantity: 1, image: 'https://images.pexels.com/photos/50593/coca-cola-cold-drink-soft-drink-coke-50593.jpeg?auto=compress&cs=tinysrgb&w=400' }
+        ];
+        let selectedTable = null;
+        let exchangeRates = {
+            bs: 45.50,
+            cop: 4250
+        };
+
+        // Mobile menu toggle
+        function toggleMobileMenu() {
+            const menu = document.getElementById('mobileMenu');
+            menu.classList.toggle('hidden');
+        }
+
+        // Add quick item to cart
+        function addQuickItem(name, size, price) {
+            const existingItem = cart.find(item => item.name === name && item.size === size);
+            
+            if (existingItem) {
+                existingItem.quantity += 1;
+            } else {
+                cart.push({
+                    name: name,
+                    size: size,
+                    price: price,
+                    quantity: 1,
+                    image: getItemImage(name)
+                });
+            }
+            
+            updateCartDisplay();
+            updateCartSummary();
+            
+            // Show feedback
+            showNotification(`${name} agregado al carrito`, 'success');
+        }
+
+        // Get item image
+        function getItemImage(name) {
+            const images = {
+                'Whankoos 440': 'https://images.unsplash.com/photo-1565299624946-b28f40a0ca4b?q=80&w=400&auto=format&fit=crop',
+                'Pepperoni': 'https://images.pixabay.com/photo/2017/12/09/08/18/pizza-3007395_960_720.jpg',
+                'Coca Cola': 'https://images.pexels.com/photos/50593/coca-cola-cold-drink-soft-drink-coke-50593.jpeg?auto=compress&cs=tinysrgb&w=400'
+            };
+            return images[name] || 'https://images.unsplash.com/photo-1584824486509-112e4181ff6b?q=80&w=2940&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D';
+        }
+
+        // Update cart display
+        function updateCartDisplay() {
+            const cartItems = document.getElementById('cartItems');
+            
+            if (cart.length === 0) {
+                cartItems.innerHTML = `
+                    <div class="text-center text-text-secondary py-8">
+                        <i class="fas fa-shopping-cart text-4xl mb-3 opacity-50"></i>
+                        <p>Carrito vacío</p>
+                        <p class="text-sm">Agrega productos del menú</p>
+                    </div>
+                `;
+                return;
+            }
+
+            cartItems.innerHTML = cart.map((item, index) => `
+                <div class="cart-item bg-surface border border-border rounded-lg p-3 animate-fade-in">
+                    <div class="flex items-center justify-between mb-2">
+                        <div class="flex items-center space-x-3">
+                            <img src="${item.image}" 
+                                 alt="${item.name} ${item.size ? `tamaño ${item.size}` : ''}" 
+                                 class="w-10 h-10 rounded object-cover"
+                                 onerror="this.src='https://images.unsplash.com/photo-1584824486509-112e4181ff6b?q=80&w=2940&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D'; this.onerror=null;">
+                            <div>
+                                <h4 class="font-medium text-text-primary">${item.name} ${item.size ? `(${item.size})` : ''}</h4>
+                                <p class="text-xs text-text-secondary">Producto del menú</p>
+                            </div>
+                        </div>
+                        <button onclick="removeCartItem(${index})" class="text-error-500 hover:text-error-600 transition-micro">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center space-x-3">
+                            <div class="flex items-center space-x-2">
+                                <button onclick="decreaseQuantity(${index})" class="w-7 h-7 bg-gray-200 text-text-primary rounded text-sm hover:bg-gray-300 transition-micro">-</button>
+                                <span class="text-sm font-medium w-8 text-center">${item.quantity}</span>
+                                <button onclick="increaseQuantity(${index})" class="w-7 h-7 bg-primary-500 text-white rounded text-sm hover:bg-primary-600 transition-micro">+</button>
+                            </div>
+                            <span class="text-xs text-text-secondary">$${item.price.toFixed(2)} c/u</span>
+                        </div>
+                        <div class="text-right">
+                            <div class="text-sm font-medium text-data">$${(item.price * item.quantity).toFixed(2)}</div>
+                            <div class="text-xs text-text-secondary">Bs ${(item.price * item.quantity * exchangeRates.bs).toFixed(2)}</div>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Cart quantity functions
+        function increaseQuantity(index) {
+            cart[index].quantity += 1;
+            updateCartDisplay();
+            updateCartSummary();
+        }
+
+        function decreaseQuantity(index) {
+            if (cart[index].quantity > 1) {
+                cart[index].quantity -= 1;
+            } else {
+                cart.splice(index, 1);
+            }
+            updateCartDisplay();
+            updateCartSummary();
+        }
+
+        function removeCartItem(index) {
+            const itemName = cart[index].name;
+            cart.splice(index, 1);
+            updateCartDisplay();
+            updateCartSummary();
+            showNotification(`${itemName} eliminado del carrito`, 'info');
+        }
+
+        // Update cart summary
+        function updateCartSummary() {
+            const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+            
+            document.getElementById('subtotalUSD').textContent = `$${subtotal.toFixed(2)}`;
+            document.getElementById('subtotalBs').textContent = `Bs ${(subtotal * exchangeRates.bs).toFixed(2)}`;
+            document.getElementById('subtotalCOP').textContent = `$${(subtotal * exchangeRates.cop).toFixed(0)}`;
+            document.getElementById('totalUSD').textContent = `$${subtotal.toFixed(2)}`;
+        }
+
+        // Table selection
+        function selectTable() {
+            const tableSelect = document.getElementById('tableSelect');
+            const selectedTableInfo = document.getElementById('selectedTableInfo');
+            const selectedTableName = document.getElementById('selectedTableName');
+            
+            if (tableSelect.value) {
+                selectedTable = tableSelect.value;
+                selectedTableName.textContent = tableSelect.value;
+                selectedTableInfo.classList.remove('hidden');
+            } else {
+                selectedTable = null;
+                selectedTableInfo.classList.add('hidden');
+            }
+        }
+
+        // Clear cart
+        function clearCart() {
+            if (cart.length === 0) return;
+            
+            if (confirm('¿Estás seguro de que deseas limpiar el carrito?')) {
+                cart = [];
+                updateCartDisplay();
+                updateCartSummary();
+                showNotification('Carrito limpiado', 'info');
+            }
+        }
+
+        // Save cart
+        function saveCart() {
+            const cartData = {
+                cart: cart,
+                selectedTable: selectedTable,
+                timestamp: new Date().toISOString()
+            };
+            
+            localStorage.setItem('whankoos_saved_cart', JSON.stringify(cartData));
+            showNotification('Carrito guardado correctamente', 'success');
+        }
+
+        // Load last order
+        function loadLastOrder() {
+            const sampleOrder = [
+                { name: 'Pepperoni', size: 'M', price: 11.00, quantity: 1, image: getItemImage('Pepperoni') },
+                { name: 'Coca Cola', size: '', price: 2.50, quantity: 2, image: getItemImage('Coca Cola') }
+            ];
+            
+            cart = sampleOrder;
+            updateCartDisplay();
+            updateCartSummary();
+            showNotification('Último pedido cargado', 'success');
+        }
+
+        // Load template
+        function loadTemplate() {
+            const template = [
+                { name: 'Whankoos 440', size: 'P', price: 8.50, quantity: 1, image: getItemImage('Whankoos 440') }
+            ];
+            
+            cart = template;
+            updateCartDisplay();
+            updateCartSummary();
+            showNotification('Plantilla cargada', 'success');
+        }
+
+        // Process payment
+        function processPayment(currency) {
+            if (cart.length === 0) {
+                showNotification('El carrito está vacío', 'error');
+                return;
+            }
+            
+            if (!selectedTable) {
+                showNotification('Selecciona una mesa primero', 'error');
+                return;
+            }
+            
+            const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+            let amount, symbol;
+            
+            switch(currency) {
+                case 'USD':
+                    amount = total.toFixed(2);
+                    symbol = '$';
+                    break;
+                case 'BS':
+                    amount = (total * exchangeRates.bs).toFixed(2);
+                    symbol = 'Bs ';
+                    break;
+                case 'COP':
+                    amount = (total * exchangeRates.cop).toFixed(0);
+                    symbol = '$';
+                    break;
+            }
+            
+            document.getElementById('paymentTable').textContent = selectedTable;
+            document.getElementById('paymentAmount').textContent = symbol + amount;
+            document.getElementById('paymentCurrency').textContent = currency;
+            
+            document.getElementById('paymentModal').classList.remove('hidden');
+            document.getElementById('paymentModal').classList.add('flex');
+        }
+
+        // Confirm payment
+        function confirmPayment() {
+            const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+            
+            // Simulate payment processing
+            setTimeout(() => {
+                closePaymentModal();
+                showNotification(`Pago procesado correctamente para Mesa ${selectedTable}`, 'success');
+                
+                // Clear cart and reset
+                cart = [];
+                selectedTable = null;
+                document.getElementById('tableSelect').value = '';
+                document.getElementById('selectedTableInfo').classList.add('hidden');
+                
+                updateCartDisplay();
+                updateCartSummary();
+            }, 1500);
+        }
+
+        // Close payment modal
+        function closePaymentModal() {
+            document.getElementById('paymentModal').classList.add('hidden');
+            document.getElementById('paymentModal').classList.remove('flex');
+        }
+
+        // Print order
+        function printOrder() {
+            if (cart.length === 0) {
+                showNotification('El carrito está vacío', 'error');
+                return;
+            }
+            
+            showNotification('Ticket enviado a impresora', 'success');
+        }
+
+        // Hold order
+        function holdOrder() {
+            if (cart.length === 0) {
+                showNotification('El carrito está vacío', 'error');
+                return;
+            }
+            
+            saveCart();
+            showNotification('Pedido mantenido en espera', 'info');
+        }
+
+        // Load order from recent orders
+        function loadOrder(orderId) {
+            const orders = {
+                1: [
+                    { name: 'Whankoos 440', size: 'P', price: 8.50, quantity: 2, image: getItemImage('Whankoos 440') },
+                    { name: 'Coca Cola', size: '', price: 2.50, quantity: 1, image: getItemImage('Coca Cola') }
+                ],
+                2: [
+                    { name: 'Pepperoni', size: 'G', price: 14.50, quantity: 1, image: getItemImage('Pepperoni') }
+                ],
+                3: [
+                    { name: 'Hawaiana', size: 'M', price: 11.50, quantity: 1, image: getItemImage('Hawaiana') }
+                ]
+            };
+            
+            if (orders[orderId]) {
+                cart = orders[orderId];
+                updateCartDisplay();
+                updateCartSummary();
+                showNotification(`Pedido #${orderId} cargado`, 'success');
+            }
+        }
+
+        // Exchange rate modal functions
+        function openRateModal() {
+            document.getElementById('rateModal').classList.remove('hidden');
+            document.getElementById('rateModal').classList.add('flex');
+        }
+
+        function closeRateModal() {
+            document.getElementById('rateModal').classList.add('hidden');
+            document.getElementById('rateModal').classList.remove('flex');
+        }
+
+        function updateRates() {
+            const bsRate = parseFloat(document.getElementById('bsRateInput').value);
+            const copRate = parseFloat(document.getElementById('copRateInput').value);
+            
+            exchangeRates.bs = bsRate;
+            exchangeRates.cop = copRate;
+            
+            document.getElementById('bsRate').textContent = bsRate.toFixed(2);
+            document.getElementById('copRate').textContent = copRate.toFixed(0);
+            
+            updateCartDisplay();
+            updateCartSummary();
+            closeRateModal();
+            
+            showNotification('Tasas de cambio actualizadas', 'success');
+        }
+
+        // Show notification
+        function showNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+            notification.className = `fixed top-4 right-4 z-50 px-4 py-2 rounded-lg text-white text-sm animate-slide-up`;
+            
+            switch(type) {
+                case 'success':
+                    notification.classList.add('bg-success-500');
+                    break;
+                case 'error':
+                    notification.classList.add('bg-error-500');
+                    break;
+                case 'info':
+                    notification.classList.add('bg-accent-500');
+                    break;
+            }
+            
+            notification.textContent = message;
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.remove();
+            }, 3000);
+        }
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function() {
+            updateCartDisplay();
+            updateCartSummary();
+            
+            // Load saved cart if exists
+            const savedCart = localStorage.getItem('whankoos_saved_cart');
+            if (savedCart) {
+                const cartData = JSON.parse(savedCart);
+                if (cartData.cart && cartData.cart.length > 0) {
+                    cart = cartData.cart;
+                    selectedTable = cartData.selectedTable;
+                    
+                    if (selectedTable) {
+                        document.getElementById('tableSelect').value = selectedTable;
+                        selectTable();
+                    }
+                    
+                    updateCartDisplay();
+                    updateCartSummary();
+                }
+            }
+        });
+    </script>
+<script id="dhws-dataInjector" src="../public/dhws-data-injector.js"></script>
+</body>
+</html>

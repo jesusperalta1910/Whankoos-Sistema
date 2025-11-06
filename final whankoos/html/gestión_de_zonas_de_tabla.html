@@ -1,0 +1,1076 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Whankoos POS Pro - Gestión de Mesas por Zona</title>
+    <link rel="stylesheet" href="../css/main.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  
+  <script type="module" src="https://static.rocket.new/rocket-web.js?_cfg=https%3A%2F%2Fwhankoosp1201back.builtwithrocket.new&_be=https%3A%2F%2Fapplication.rocket.new&_v=0.1.9"></script>
+  <script type="module" src="https://static.rocket.new/rocket-shot.js?v=0.0.1"></script>
+  </head>
+<body class="bg-background min-h-screen">
+    <!-- Header -->
+    <header class="bg-white shadow-card border-b border-border">
+        <div class="max-w-full mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <!-- Logo -->
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 bg-gradient-to-br from-primary-500 to-secondary-600 rounded-lg flex items-center justify-center">
+                        <i class="fas fa-pizza-slice text-white text-lg"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-xl font-bold text-text-primary">Whankoos POS Pro</h1>
+                        <p class="text-sm text-text-secondary">Gestión de Mesas por Zona</p>
+                    </div>
+                </div>
+
+                <!-- Navigation -->
+                <nav class="hidden md:flex items-center space-x-4">
+                    <a href="main_pos_dashboard.html" class="px-4 py-2 text-text-secondary hover:text-primary-500 transition-micro">
+                        <i class="fas fa-home mr-2"></i>Dashboard
+                    </a>
+                    <a href="exchange_rate_management.html" class="px-4 py-2 text-text-secondary hover:text-primary-500 transition-micro">
+                        <i class="fas fa-exchange-alt mr-2"></i>Tasas
+                    </a>
+                    <a href="sales_history_analytics.html" class="px-4 py-2 text-text-secondary hover:text-primary-500 transition-micro">
+                        <i class="fas fa-chart-line mr-2"></i>Ventas
+                    </a>
+                    <a href="table_zone_management.html" class="px-4 py-2 bg-primary-500 text-white rounded-button font-medium">
+                        <i class="fas fa-table mr-2"></i>Mesas
+                    </a>
+                    <a href="order_cart_management.html" class="px-4 py-2 text-text-secondary hover:text-primary-500 transition-micro">
+                        <i class="fas fa-shopping-cart mr-2"></i>Pedidos
+                    </a>
+                </nav>
+
+                <!-- Mobile Menu Button -->
+                <button class="md:hidden p-2 text-text-secondary hover:text-primary-500" onclick="toggleMobileMenu()">
+                    <i class="fas fa-bars text-xl"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Mobile Navigation -->
+        <div id="mobileMenu" class="hidden md:hidden bg-white border-t border-border">
+            <div class="px-4 py-2 space-y-2">
+                <a href="main_pos_dashboard.html" class="block px-4 py-2 text-text-secondary hover:text-primary-500 transition-micro">
+                    <i class="fas fa-home mr-2"></i>Dashboard Principal
+                </a>
+                <a href="exchange_rate_management.html" class="block px-4 py-2 text-text-secondary hover:text-primary-500 transition-micro">
+                    <i class="fas fa-exchange-alt mr-2"></i>Tasas de Cambio
+                </a>
+                <a href="sales_history_analytics.html" class="block px-4 py-2 text-text-secondary hover:text-primary-500 transition-micro">
+                    <i class="fas fa-chart-line mr-2"></i>Historial de Ventas
+                </a>
+                <a href="table_zone_management.html" class="block px-4 py-2 bg-primary-500 text-white rounded-button font-medium">
+                    <i class="fas fa-table mr-2"></i>Gestión de Mesas
+                </a>
+                <a href="order_cart_management.html" class="block px-4 py-2 text-text-secondary hover:text-primary-500 transition-micro">
+                    <i class="fas fa-shopping-cart mr-2"></i>Gestión de Pedidos
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="flex-1 p-4 lg:p-6">
+        <!-- Zone Controls Header -->
+        <div class="bg-white rounded-lg shadow-card border border-border p-6 mb-6">
+            <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+                <div>
+                    <h2 class="text-2xl font-bold text-text-primary mb-2">Gestión de Mesas por Zona</h2>
+                    <p class="text-text-secondary">Organiza y monitorea las mesas por área del restaurante</p>
+                </div>
+                
+                <!-- Zone Statistics -->
+                <div class="flex flex-wrap gap-4">
+                    <div class="bg-success-50 px-4 py-2 rounded-lg">
+                        <div class="text-sm text-success-600 font-medium">Disponibles</div>
+                        <div class="text-lg font-bold text-success-700" id="availableTables">10</div>
+                    </div>
+                    <div class="bg-error-50 px-4 py-2 rounded-lg">
+                        <div class="text-sm text-error-600 font-medium">Ocupadas</div>
+                        <div class="text-lg font-bold text-error-700" id="occupiedTables">3</div>
+                    </div>
+                    <div class="bg-warning-50 px-4 py-2 rounded-lg">
+                        <div class="text-sm text-warning-600 font-medium">Total</div>
+                        <div class="text-lg font-bold text-warning-700" id="totalTables">13</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Zone Filter Controls -->
+        <div class="bg-white rounded-lg shadow-card border border-border p-6 mb-6">
+            <div class="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
+                <div class="flex flex-wrap gap-2">
+                    <button onclick="filterZone('all')" class="zone-filter px-4 py-2 rounded-button bg-primary-500 text-white font-medium transition-micro" data-zone="all">
+                        <i class="fas fa-th-large mr-2"></i>Todas las Zonas
+                    </button>
+                    <button onclick="filterZone('terraza')" class="zone-filter px-4 py-2 rounded-button border border-border text-text-secondary hover:bg-primary-50 hover:text-primary-600 transition-micro" data-zone="terraza">
+                        <i class="fas fa-umbrella-beach mr-2"></i>Terraza (4)
+                    </button>
+                    <button onclick="filterZone('piso1')" class="zone-filter px-4 py-2 rounded-button border border-border text-text-secondary hover:bg-primary-50 hover:text-primary-600 transition-micro" data-zone="piso1">
+                        <i class="fas fa-building mr-2"></i>Piso 1 (5)
+                    </button>
+                    <button onclick="filterZone('piso2')" class="zone-filter px-4 py-2 rounded-button border border-border text-text-secondary hover:bg-primary-50 hover:text-primary-600 transition-micro" data-zone="piso2">
+                        <i class="fas fa-stairs mr-2"></i>Piso 2 (4)
+                    </button>
+                </div>
+
+                <!-- Bulk Actions -->
+                <div class="flex gap-2">
+                    <button onclick="liberateAllTables()" class="px-4 py-2 bg-success-500 text-white rounded-button hover:bg-success-600 transition-micro">
+                        <i class="fas fa-unlock mr-2"></i>Liberar Todas
+                    </button>
+                    <button onclick="refreshZones()" class="px-4 py-2 border border-border text-text-secondary rounded-button hover:bg-gray-50 transition-micro">
+                        <i class="fas fa-sync-alt mr-2"></i>Actualizar
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tables Grid Container -->
+        <div class="space-y-6">
+            <!-- Terraza Zone -->
+            <div class="zone-section bg-white rounded-lg shadow-card border border-border p-6" data-zone="terraza">
+                <div class="flex items-center justify-between mb-6">
+                    <h3 class="text-xl font-semibold text-text-primary flex items-center">
+                        <i class="fas fa-umbrella-beach text-success-500 mr-3"></i>
+                        Terraza
+                        <span class="ml-2 text-sm bg-success-100 text-success-700 px-2 py-1 rounded-full">4 mesas</span>
+                    </h3>
+                    <div class="text-sm text-text-secondary">
+                        Área exterior con vista panorámica
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                    <!-- Table T1 -->
+                    <div class="table-card bg-surface border-2 border-success-500 rounded-lg p-4 cursor-pointer hover:shadow-md transition-smooth interactive-scale" 
+                         data-table="T1" data-zone="terraza" data-status="free" onclick="selectTable('T1')" draggable="true">
+                        <div class="flex items-center justify-between mb-3">
+                            <div class="flex items-center space-x-2">
+                                <div class="w-4 h-4 bg-success-500 rounded-full"></div>
+                                <span class="font-semibold text-text-primary">Mesa T1</span>
+                            </div>
+                            <div class="relative">
+                                <button onclick="showTableMenu(event, 'T1')" class="p-1 text-text-secondary hover:text-text-primary transition-micro">
+                                    <i class="fas fa-ellipsis-v"></i>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="space-y-2">
+                            <div class="flex items-center justify-between">
+                                <span class="text-sm text-success-600 font-medium">Disponible</span>
+                                <span class="text-xs text-text-secondary">4 personas</span>
+                            </div>
+                            <div class="text-xs text-text-secondary">
+                                <i class="fas fa-clock mr-1"></i>Última limpieza: 14:30
+                            </div>
+                        </div>
+
+                        <div class="mt-3 pt-3 border-t border-border-light">
+                            <div class="flex justify-between items-center">
+                                <span class="text-xs text-text-secondary">Estado:</span>
+                                <span class="text-xs bg-success-100 text-success-700 px-2 py-1 rounded-full">Libre</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Table T2 - Occupied -->
+                    <div class="table-card bg-surface border-2 border-error-500 rounded-lg p-4 cursor-pointer hover:shadow-md transition-smooth interactive-scale" 
+                         data-table="T2" data-zone="terraza" data-status="occupied" onclick="selectTable('T2')" draggable="true">
+                        <div class="flex items-center justify-between mb-3">
+                            <div class="flex items-center space-x-2">
+                                <div class="w-4 h-4 bg-error-500 rounded-full"></div>
+                                <span class="font-semibold text-text-primary">Mesa T2</span>
+                            </div>
+                            <div class="relative">
+                                <button onclick="showTableMenu(event, 'T2')" class="p-1 text-text-secondary hover:text-text-primary transition-micro">
+                                    <i class="fas fa-ellipsis-v"></i>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="space-y-2">
+                            <div class="flex items-center justify-between">
+                                <span class="text-sm text-error-600 font-medium">Ocupada</span>
+                                <span class="text-xs text-text-secondary">2 personas</span>
+                            </div>
+                            <div class="text-xs text-text-secondary">
+                                <i class="fas fa-user mr-1"></i>Cliente: María González
+                            </div>
+                            <div class="text-xs text-text-secondary">
+                                <i class="fas fa-clock mr-1"></i>Tiempo: 25 min
+                            </div>
+                        </div>
+
+                        <div class="mt-3 pt-3 border-t border-border-light">
+                            <div class="flex justify-between items-center">
+                                <span class="text-xs text-text-secondary">Pedido:</span>
+                                <span class="text-xs text-data">$24.50</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Table T3 -->
+                    <div class="table-card bg-surface border-2 border-success-500 rounded-lg p-4 cursor-pointer hover:shadow-md transition-smooth interactive-scale" 
+                         data-table="T3" data-zone="terraza" data-status="free" onclick="selectTable('T3')" draggable="true">
+                        <div class="flex items-center justify-between mb-3">
+                            <div class="flex items-center space-x-2">
+                                <div class="w-4 h-4 bg-success-500 rounded-full"></div>
+                                <span class="font-semibold text-text-primary">Mesa T3</span>
+                            </div>
+                            <div class="relative">
+                                <button onclick="showTableMenu(event, 'T3')" class="p-1 text-text-secondary hover:text-text-primary transition-micro">
+                                    <i class="fas fa-ellipsis-v"></i>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="space-y-2">
+                            <div class="flex items-center justify-between">
+                                <span class="text-sm text-success-600 font-medium">Disponible</span>
+                                <span class="text-xs text-text-secondary">6 personas</span>
+                            </div>
+                            <div class="text-xs text-text-secondary">
+                                <i class="fas fa-clock mr-1"></i>Última limpieza: 15:15
+                            </div>
+                        </div>
+
+                        <div class="mt-3 pt-3 border-t border-border-light">
+                            <div class="flex justify-between items-center">
+                                <span class="text-xs text-text-secondary">Estado:</span>
+                                <span class="text-xs bg-success-100 text-success-700 px-2 py-1 rounded-full">Libre</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Table T4 -->
+                    <div class="table-card bg-surface border-2 border-success-500 rounded-lg p-4 cursor-pointer hover:shadow-md transition-smooth interactive-scale" 
+                         data-table="T4" data-zone="terraza" data-status="free" onclick="selectTable('T4')" draggable="true">
+                        <div class="flex items-center justify-between mb-3">
+                            <div class="flex items-center space-x-2">
+                                <div class="w-4 h-4 bg-success-500 rounded-full"></div>
+                                <span class="font-semibold text-text-primary">Mesa T4</span>
+                            </div>
+                            <div class="relative">
+                                <button onclick="showTableMenu(event, 'T4')" class="p-1 text-text-secondary hover:text-text-primary transition-micro">
+                                    <i class="fas fa-ellipsis-v"></i>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="space-y-2">
+                            <div class="flex items-center justify-between">
+                                <span class="text-sm text-success-600 font-medium">Disponible</span>
+                                <span class="text-xs text-text-secondary">4 personas</span>
+                            </div>
+                            <div class="text-xs text-text-secondary">
+                                <i class="fas fa-clock mr-1"></i>Última limpieza: 14:45
+                            </div>
+                        </div>
+
+                        <div class="mt-3 pt-3 border-t border-border-light">
+                            <div class="flex justify-between items-center">
+                                <span class="text-xs text-text-secondary">Estado:</span>
+                                <span class="text-xs bg-success-100 text-success-700 px-2 py-1 rounded-full">Libre</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Piso 1 Zone -->
+            <div class="zone-section bg-white rounded-lg shadow-card border border-border p-6" data-zone="piso1">
+                <div class="flex items-center justify-between mb-6">
+                    <h3 class="text-xl font-semibold text-text-primary flex items-center">
+                        <i class="fas fa-building text-accent-500 mr-3"></i>
+                        Piso 1
+                        <span class="ml-2 text-sm bg-accent-100 text-accent-700 px-2 py-1 rounded-full">5 mesas</span>
+                    </h3>
+                    <div class="text-sm text-text-secondary">
+                        Área principal del restaurante
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                    <!-- Table P1-1 -->
+                    <div class="table-card bg-surface border-2 border-success-500 rounded-lg p-4 cursor-pointer hover:shadow-md transition-smooth interactive-scale" 
+                         data-table="P1-1" data-zone="piso1" data-status="free" onclick="selectTable('P1-1')" draggable="true">
+                        <div class="flex items-center justify-between mb-3">
+                            <div class="flex items-center space-x-2">
+                                <div class="w-4 h-4 bg-success-500 rounded-full"></div>
+                                <span class="font-semibold text-text-primary">Mesa P1-1</span>
+                            </div>
+                            <div class="relative">
+                                <button onclick="showTableMenu(event, 'P1-1')" class="p-1 text-text-secondary hover:text-text-primary transition-micro">
+                                    <i class="fas fa-ellipsis-v"></i>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="space-y-2">
+                            <div class="flex items-center justify-between">
+                                <span class="text-sm text-success-600 font-medium">Disponible</span>
+                                <span class="text-xs text-text-secondary">2 personas</span>
+                            </div>
+                            <div class="text-xs text-text-secondary">
+                                <i class="fas fa-clock mr-1"></i>Última limpieza: 15:00
+                            </div>
+                        </div>
+
+                        <div class="mt-3 pt-3 border-t border-border-light">
+                            <div class="flex justify-between items-center">
+                                <span class="text-xs text-text-secondary">Estado:</span>
+                                <span class="text-xs bg-success-100 text-success-700 px-2 py-1 rounded-full">Libre</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Table P1-2 - Occupied -->
+                    <div class="table-card bg-surface border-2 border-error-500 rounded-lg p-4 cursor-pointer hover:shadow-md transition-smooth interactive-scale" 
+                         data-table="P1-2" data-zone="piso1" data-status="occupied" onclick="selectTable('P1-2')" draggable="true">
+                        <div class="flex items-center justify-between mb-3">
+                            <div class="flex items-center space-x-2">
+                                <div class="w-4 h-4 bg-error-500 rounded-full"></div>
+                                <span class="font-semibold text-text-primary">Mesa P1-2</span>
+                            </div>
+                            <div class="relative">
+                                <button onclick="showTableMenu(event, 'P1-2')" class="p-1 text-text-secondary hover:text-text-primary transition-micro">
+                                    <i class="fas fa-ellipsis-v"></i>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="space-y-2">
+                            <div class="flex items-center justify-between">
+                                <span class="text-sm text-error-600 font-medium">Ocupada</span>
+                                <span class="text-xs text-text-secondary">4 personas</span>
+                            </div>
+                            <div class="text-xs text-text-secondary">
+                                <i class="fas fa-user mr-1"></i>Cliente: Carlos Rodríguez
+                            </div>
+                            <div class="text-xs text-text-secondary">
+                                <i class="fas fa-clock mr-1"></i>Tiempo: 18 min
+                            </div>
+                        </div>
+
+                        <div class="mt-3 pt-3 border-t border-border-light">
+                            <div class="flex justify-between items-center">
+                                <span class="text-xs text-text-secondary">Pedido:</span>
+                                <span class="text-xs text-data">$42.75</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Table P1-3 -->
+                    <div class="table-card bg-surface border-2 border-success-500 rounded-lg p-4 cursor-pointer hover:shadow-md transition-smooth interactive-scale" 
+                         data-table="P1-3" data-zone="piso1" data-status="free" onclick="selectTable('P1-3')" draggable="true">
+                        <div class="flex items-center justify-between mb-3">
+                            <div class="flex items-center space-x-2">
+                                <div class="w-4 h-4 bg-success-500 rounded-full"></div>
+                                <span class="font-semibold text-text-primary">Mesa P1-3</span>
+                            </div>
+                            <div class="relative">
+                                <button onclick="showTableMenu(event, 'P1-3')" class="p-1 text-text-secondary hover:text-text-primary transition-micro">
+                                    <i class="fas fa-ellipsis-v"></i>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="space-y-2">
+                            <div class="flex items-center justify-between">
+                                <span class="text-sm text-success-600 font-medium">Disponible</span>
+                                <span class="text-xs text-text-secondary">4 personas</span>
+                            </div>
+                            <div class="text-xs text-text-secondary">
+                                <i class="fas fa-clock mr-1"></i>Última limpieza: 14:20
+                            </div>
+                        </div>
+
+                        <div class="mt-3 pt-3 border-t border-border-light">
+                            <div class="flex justify-between items-center">
+                                <span class="text-xs text-text-secondary">Estado:</span>
+                                <span class="text-xs bg-success-100 text-success-700 px-2 py-1 rounded-full">Libre</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Table P1-4 -->
+                    <div class="table-card bg-surface border-2 border-success-500 rounded-lg p-4 cursor-pointer hover:shadow-md transition-smooth interactive-scale" 
+                         data-table="P1-4" data-zone="piso1" data-status="free" onclick="selectTable('P1-4')" draggable="true">
+                        <div class="flex items-center justify-between mb-3">
+                            <div class="flex items-center space-x-2">
+                                <div class="w-4 h-4 bg-success-500 rounded-full"></div>
+                                <span class="font-semibold text-text-primary">Mesa P1-4</span>
+                            </div>
+                            <div class="relative">
+                                <button onclick="showTableMenu(event, 'P1-4')" class="p-1 text-text-secondary hover:text-text-primary transition-micro">
+                                    <i class="fas fa-ellipsis-v"></i>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="space-y-2">
+                            <div class="flex items-center justify-between">
+                                <span class="text-sm text-success-600 font-medium">Disponible</span>
+                                <span class="text-xs text-text-secondary">6 personas</span>
+                            </div>
+                            <div class="text-xs text-text-secondary">
+                                <i class="fas fa-clock mr-1"></i>Última limpieza: 15:30
+                            </div>
+                        </div>
+
+                        <div class="mt-3 pt-3 border-t border-border-light">
+                            <div class="flex justify-between items-center">
+                                <span class="text-xs text-text-secondary">Estado:</span>
+                                <span class="text-xs bg-success-100 text-success-700 px-2 py-1 rounded-full">Libre</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Table P1-5 - Large Table -->
+                    <div class="table-card bg-surface border-2 border-success-500 rounded-lg p-4 cursor-pointer hover:shadow-md transition-smooth interactive-scale sm:col-span-2 lg:col-span-1" 
+                         data-table="P1-5" data-zone="piso1" data-status="free" onclick="selectTable('P1-5')" draggable="true">
+                        <div class="flex items-center justify-between mb-3">
+                            <div class="flex items-center space-x-2">
+                                <div class="w-4 h-4 bg-success-500 rounded-full"></div>
+                                <span class="font-semibold text-text-primary">Mesa P1-5</span>
+                                <span class="text-xs bg-accent-100 text-accent-700 px-2 py-1 rounded-full">Grande</span>
+                            </div>
+                            <div class="relative">
+                                <button onclick="showTableMenu(event, 'P1-5')" class="p-1 text-text-secondary hover:text-text-primary transition-micro">
+                                    <i class="fas fa-ellipsis-v"></i>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="space-y-2">
+                            <div class="flex items-center justify-between">
+                                <span class="text-sm text-success-600 font-medium">Disponible</span>
+                                <span class="text-xs text-text-secondary">8 personas</span>
+                            </div>
+                            <div class="text-xs text-text-secondary">
+                                <i class="fas fa-clock mr-1"></i>Última limpieza: 14:50
+                            </div>
+                        </div>
+
+                        <div class="mt-3 pt-3 border-t border-border-light">
+                            <div class="flex justify-between items-center">
+                                <span class="text-xs text-text-secondary">Estado:</span>
+                                <span class="text-xs bg-success-100 text-success-700 px-2 py-1 rounded-full">Libre</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Piso 2 Zone -->
+            <div class="zone-section bg-white rounded-lg shadow-card border border-border p-6" data-zone="piso2">
+                <div class="flex items-center justify-between mb-6">
+                    <h3 class="text-xl font-semibold text-text-primary flex items-center">
+                        <i class="fas fa-stairs text-warning-500 mr-3"></i>
+                        Piso 2
+                        <span class="ml-2 text-sm bg-warning-100 text-warning-700 px-2 py-1 rounded-full">4 mesas</span>
+                    </h3>
+                    <div class="text-sm text-text-secondary">
+                        Área privada y familiar
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                    <!-- Table P2-1 -->
+                    <div class="table-card bg-surface border-2 border-success-500 rounded-lg p-4 cursor-pointer hover:shadow-md transition-smooth interactive-scale" 
+                         data-table="P2-1" data-zone="piso2" data-status="free" onclick="selectTable('P2-1')" draggable="true">
+                        <div class="flex items-center justify-between mb-3">
+                            <div class="flex items-center space-x-2">
+                                <div class="w-4 h-4 bg-success-500 rounded-full"></div>
+                                <span class="font-semibold text-text-primary">Mesa P2-1</span>
+                            </div>
+                            <div class="relative">
+                                <button onclick="showTableMenu(event, 'P2-1')" class="p-1 text-text-secondary hover:text-text-primary transition-micro">
+                                    <i class="fas fa-ellipsis-v"></i>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="space-y-2">
+                            <div class="flex items-center justify-between">
+                                <span class="text-sm text-success-600 font-medium">Disponible</span>
+                                <span class="text-xs text-text-secondary">2 personas</span>
+                            </div>
+                            <div class="text-xs text-text-secondary">
+                                <i class="fas fa-clock mr-1"></i>Última limpieza: 15:10
+                            </div>
+                        </div>
+
+                        <div class="mt-3 pt-3 border-t border-border-light">
+                            <div class="flex justify-between items-center">
+                                <span class="text-xs text-text-secondary">Estado:</span>
+                                <span class="text-xs bg-success-100 text-success-700 px-2 py-1 rounded-full">Libre</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Table P2-2 -->
+                    <div class="table-card bg-surface border-2 border-success-500 rounded-lg p-4 cursor-pointer hover:shadow-md transition-smooth interactive-scale" 
+                         data-table="P2-2" data-zone="piso2" data-status="free" onclick="selectTable('P2-2')" draggable="true">
+                        <div class="flex items-center justify-between mb-3">
+                            <div class="flex items-center space-x-2">
+                                <div class="w-4 h-4 bg-success-500 rounded-full"></div>
+                                <span class="font-semibold text-text-primary">Mesa P2-2</span>
+                            </div>
+                            <div class="relative">
+                                <button onclick="showTableMenu(event, 'P2-2')" class="p-1 text-text-secondary hover:text-text-primary transition-micro">
+                                    <i class="fas fa-ellipsis-v"></i>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="space-y-2">
+                            <div class="flex items-center justify-between">
+                                <span class="text-sm text-success-600 font-medium">Disponible</span>
+                                <span class="text-xs text-text-secondary">4 personas</span>
+                            </div>
+                            <div class="text-xs text-text-secondary">
+                                <i class="fas fa-clock mr-1"></i>Última limpieza: 14:40
+                            </div>
+                        </div>
+
+                        <div class="mt-3 pt-3 border-t border-border-light">
+                            <div class="flex justify-between items-center">
+                                <span class="text-xs text-text-secondary">Estado:</span>
+                                <span class="text-xs bg-success-100 text-success-700 px-2 py-1 rounded-full">Libre</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Table P2-3 - Occupied -->
+                    <div class="table-card bg-surface border-2 border-error-500 rounded-lg p-4 cursor-pointer hover:shadow-md transition-smooth interactive-scale" 
+                         data-table="P2-3" data-zone="piso2" data-status="occupied" onclick="selectTable('P2-3')" draggable="true">
+                        <div class="flex items-center justify-between mb-3">
+                            <div class="flex items-center space-x-2">
+                                <div class="w-4 h-4 bg-error-500 rounded-full"></div>
+                                <span class="font-semibold text-text-primary">Mesa P2-3</span>
+                            </div>
+                            <div class="relative">
+                                <button onclick="showTableMenu(event, 'P2-3')" class="p-1 text-text-secondary hover:text-text-primary transition-micro">
+                                    <i class="fas fa-ellipsis-v"></i>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="space-y-2">
+                            <div class="flex items-center justify-between">
+                                <span class="text-sm text-error-600 font-medium">Ocupada</span>
+                                <span class="text-xs text-text-secondary">4 personas</span>
+                            </div>
+                            <div class="text-xs text-text-secondary">
+                                <i class="fas fa-user mr-1"></i>Cliente: Ana Martínez
+                            </div>
+                            <div class="text-xs text-text-secondary">
+                                <i class="fas fa-clock mr-1"></i>Tiempo: 35 min
+                            </div>
+                        </div>
+
+                        <div class="mt-3 pt-3 border-t border-border-light">
+                            <div class="flex justify-between items-center">
+                                <span class="text-xs text-text-secondary">Pedido:</span>
+                                <span class="text-xs text-data">$31.25</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Table P2-4 -->
+                    <div class="table-card bg-surface border-2 border-success-500 rounded-lg p-4 cursor-pointer hover:shadow-md transition-smooth interactive-scale" 
+                         data-table="P2-4" data-zone="piso2" data-status="free" onclick="selectTable('P2-4')" draggable="true">
+                        <div class="flex items-center justify-between mb-3">
+                            <div class="flex items-center space-x-2">
+                                <div class="w-4 h-4 bg-success-500 rounded-full"></div>
+                                <span class="font-semibold text-text-primary">Mesa P2-4</span>
+                            </div>
+                            <div class="relative">
+                                <button onclick="showTableMenu(event, 'P2-4')" class="p-1 text-text-secondary hover:text-text-primary transition-micro">
+                                    <i class="fas fa-ellipsis-v"></i>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="space-y-2">
+                            <div class="flex items-center justify-between">
+                                <span class="text-sm text-success-600 font-medium">Disponible</span>
+                                <span class="text-xs text-text-secondary">6 personas</span>
+                            </div>
+                            <div class="text-xs text-text-secondary">
+                                <i class="fas fa-clock mr-1"></i>Última limpieza: 15:20
+                            </div>
+                        </div>
+
+                        <div class="mt-3 pt-3 border-t border-border-light">
+                            <div class="flex justify-between items-center">
+                                <span class="text-xs text-text-secondary">Estado:</span>
+                                <span class="text-xs bg-success-100 text-success-700 px-2 py-1 rounded-full">Libre</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Table Context Menu -->
+    <div id="tableContextMenu" class="fixed bg-white rounded-lg shadow-floating border border-border py-2 z-50 hidden">
+        <button onclick="assignOrder()" class="w-full px-4 py-2 text-left text-sm text-text-primary hover:bg-primary-50 transition-micro">
+            <i class="fas fa-plus mr-2 text-primary-500"></i>Asignar Pedido
+        </button>
+        <button onclick="liberateTable()" class="w-full px-4 py-2 text-left text-sm text-text-primary hover:bg-success-50 transition-micro">
+            <i class="fas fa-unlock mr-2 text-success-500"></i>Liberar Mesa
+        </button>
+        <button onclick="markMaintenance()" class="w-full px-4 py-2 text-left text-sm text-text-primary hover:bg-warning-50 transition-micro">
+            <i class="fas fa-tools mr-2 text-warning-500"></i>Mantenimiento
+        </button>
+        <button onclick="reserveTable()" class="w-full px-4 py-2 text-left text-sm text-text-primary hover:bg-accent-50 transition-micro">
+            <i class="fas fa-bookmark mr-2 text-accent-500"></i>Reservar
+        </button>
+        <div class="border-t border-border my-1"></div>
+        <button onclick="viewTableDetails()" class="w-full px-4 py-2 text-left text-sm text-text-primary hover:bg-gray-50 transition-micro">
+            <i class="fas fa-info-circle mr-2 text-text-secondary"></i>Ver Detalles
+        </button>
+    </div>
+
+    <!-- Table Details Modal -->
+    <div id="tableDetailsModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+        <div class="bg-white rounded-lg p-6 w-full max-w-md mx-4 shadow-floating">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-lg font-semibold text-text-primary" id="modalTableTitle">Detalles de Mesa</h3>
+                <button onclick="closeTableModal()" class="text-text-secondary hover:text-text-primary transition-micro">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+
+            <div id="tableDetailsContent" class="space-y-4">
+                <!-- Content will be dynamically populated -->
+            </div>
+
+            <div class="flex space-x-3 pt-4 mt-4 border-t border-border">
+                <button onclick="closeTableModal()" class="flex-1 border border-border text-text-primary py-2 rounded-button hover:bg-gray-50 transition-micro">
+                    Cerrar
+                </button>
+                <button onclick="editTableStatus()" class="flex-1 bg-primary-500 text-white py-2 rounded-button font-medium hover:bg-primary-600 transition-micro">
+                    Editar Estado
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global variables
+        let selectedTable = null;
+        let currentContextTable = null;
+        let draggedTable = null;
+
+        // Mobile menu toggle
+        function toggleMobileMenu() {
+            const menu = document.getElementById('mobileMenu');
+            menu.classList.toggle('hidden');
+        }
+
+        // Zone filtering
+        function filterZone(zone) {
+            // Update filter buttons
+            document.querySelectorAll('.zone-filter').forEach(btn => {
+                btn.classList.remove('bg-primary-500', 'text-white');
+                btn.classList.add('border', 'border-border', 'text-text-secondary');
+            });
+            
+            const activeButton = document.querySelector(`[data-zone="${zone}"]`);
+            activeButton.classList.remove('border', 'border-border', 'text-text-secondary');
+            activeButton.classList.add('bg-primary-500', 'text-white');
+            
+            // Show/hide zones with smooth transitions
+            document.querySelectorAll('.zone-section').forEach(section => {
+                if (zone === 'all' || section.dataset.zone === zone) {
+                    section.style.display = 'block';
+                    section.style.opacity = '0';
+                    setTimeout(() => {
+                        section.style.opacity = '1';
+                    }, 50);
+                } else {
+                    section.style.opacity = '0';
+                    setTimeout(() => {
+                        section.style.display = 'none';
+                    }, 200);
+                }
+            });
+
+            // Update statistics based on visible tables
+            updateZoneStatistics(zone);
+        }
+
+        // Update zone statistics
+        function updateZoneStatistics(zone) {
+            let availableCount = 0;
+            let occupiedCount = 0;
+            let totalCount = 0;
+
+            const visibleTables = zone === 'all' 
+                ? document.querySelectorAll('.table-card')
+                : document.querySelectorAll(`.zone-section[data-zone="${zone}"] .table-card`);
+
+            visibleTables.forEach(table => {
+                totalCount++;
+                if (table.dataset.status === 'free') {
+                    availableCount++;
+                } else if (table.dataset.status === 'occupied') {
+                    occupiedCount++;
+                }
+            });
+
+            document.getElementById('availableTables').textContent = availableCount;
+            document.getElementById('occupiedTables').textContent = occupiedCount;
+            document.getElementById('totalTables').textContent = totalCount;
+        }
+
+        // Table selection
+        function selectTable(tableId) {
+            // Remove previous selection
+            document.querySelectorAll('.table-card').forEach(card => {
+                card.classList.remove('ring-2', 'ring-primary-500');
+            });
+            
+            // Add selection to clicked table
+            const tableCard = document.querySelector(`[data-table="${tableId}"]`);
+            tableCard.classList.add('ring-2', 'ring-primary-500');
+            
+            selectedTable = tableId;
+        }
+
+        // Show table context menu
+        function showTableMenu(event, tableId) {
+            event.stopPropagation();
+            event.preventDefault();
+            
+            currentContextTable = tableId;
+            const menu = document.getElementById('tableContextMenu');
+            
+            // Position menu
+            menu.style.left = event.pageX + 'px';
+            menu.style.top = event.pageY + 'px';
+            menu.classList.remove('hidden');
+            
+            // Hide menu when clicking elsewhere
+            setTimeout(() => {
+                document.addEventListener('click', hideContextMenu, { once: true });
+            }, 10);
+        }
+
+        // Hide context menu
+        function hideContextMenu() {
+            document.getElementById('tableContextMenu').classList.add('hidden');
+        }
+
+        // Context menu actions
+        function assignOrder() {
+            if (currentContextTable) {
+                alert(`Asignando pedido a Mesa ${currentContextTable}`);
+                // Here you would typically open the order assignment interface
+                window.location.href = 'order_cart_management.html';
+            }
+            hideContextMenu();
+        }
+
+        function liberateTable() {
+            if (currentContextTable) {
+                const tableCard = document.querySelector(`[data-table="${currentContextTable}"]`);
+                
+                // Update table status to free
+                tableCard.dataset.status = 'free';
+                tableCard.classList.remove('border-error-500');
+                tableCard.classList.add('border-success-500');
+                
+                // Update visual indicators
+                const statusDot = tableCard.querySelector('.w-4');
+                statusDot.classList.remove('bg-error-500');
+                statusDot.classList.add('bg-success-500');
+                
+                // Update status text and content
+                const statusText = tableCard.querySelector('.text-sm.font-medium');
+                statusText.textContent = 'Disponible';
+                statusText.classList.remove('text-error-600');
+                statusText.classList.add('text-success-600');
+                
+                // Remove customer and order info, add cleaning time
+                const infoContainer = tableCard.querySelector('.space-y-2');
+                const capacity = infoContainer.querySelector('.text-xs.text-text-secondary').textContent;
+                infoContainer.innerHTML = `
+                    <div class="flex items-center justify-between">
+                        <span class="text-sm text-success-600 font-medium">Disponible</span>
+                        <span class="text-xs text-text-secondary">${capacity}</span>
+                    </div>
+                    <div class="text-xs text-text-secondary">
+                        <i class="fas fa-clock mr-1"></i>Última limpieza: ${new Date().toLocaleTimeString('es-ES', {hour: '2-digit', minute: '2-digit'})}
+                    </div>
+                `;
+                
+                // Update bottom status
+                const bottomStatus = tableCard.querySelector('.mt-3 .flex');
+                bottomStatus.innerHTML = `
+                    <span class="text-xs text-text-secondary">Estado:</span>
+                    <span class="text-xs bg-success-100 text-success-700 px-2 py-1 rounded-full">Libre</span>
+                `;
+                
+                alert(`Mesa ${currentContextTable} liberada correctamente`);
+                updateZoneStatistics('all');
+            }
+            hideContextMenu();
+        }
+
+        function markMaintenance() {
+            if (currentContextTable) {
+                const tableCard = document.querySelector(`[data-table="${currentContextTable}"]`);
+                
+                // Update table status to maintenance
+                tableCard.dataset.status = 'maintenance';
+                tableCard.classList.remove('border-success-500', 'border-error-500');
+                tableCard.classList.add('border-warning-500');
+                
+                // Update visual indicators
+                const statusDot = tableCard.querySelector('.w-4');
+                statusDot.classList.remove('bg-success-500', 'bg-error-500');
+                statusDot.classList.add('bg-warning-500');
+                
+                // Update status text
+                const statusText = tableCard.querySelector('.text-sm.font-medium');
+                statusText.textContent = 'Mantenimiento';
+                statusText.classList.remove('text-success-600', 'text-error-600');
+                statusText.classList.add('text-warning-600');
+                
+                alert(`Mesa ${currentContextTable} marcada para mantenimiento`);
+            }
+            hideContextMenu();
+        }
+
+        function reserveTable() {
+            if (currentContextTable) {
+                const customerName = prompt('Nombre del cliente para la reserva:');
+                if (customerName) {
+                    alert(`Mesa ${currentContextTable} reservada para ${customerName}`);
+                }
+            }
+            hideContextMenu();
+        }
+
+        function viewTableDetails() {
+            if (currentContextTable) {
+                const tableCard = document.querySelector(`[data-table="${currentContextTable}"]`);
+                const status = tableCard.dataset.status;
+                const zone = tableCard.dataset.zone;
+                
+                document.getElementById('modalTableTitle').textContent = `Detalles de Mesa ${currentContextTable}`;
+                
+                let detailsHTML = `
+                    <div class="space-y-3">
+                        <div class="flex justify-between">
+                            <span class="text-sm text-text-secondary">Mesa:</span>
+                            <span class="text-sm font-medium text-text-primary">${currentContextTable}</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-sm text-text-secondary">Zona:</span>
+                            <span class="text-sm font-medium text-text-primary">${getZoneName(zone)}</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-sm text-text-secondary">Estado:</span>
+                            <span class="text-sm font-medium ${getStatusColor(status)}">${getStatusText(status)}</span>
+                        </div>
+                `;
+                
+                if (status === 'occupied') {
+                    const customerInfo = tableCard.querySelector('.text-xs.text-text-secondary');
+                    const timeInfo = tableCard.querySelectorAll('.text-xs.text-text-secondary')[1];
+                    const orderInfo = tableCard.querySelector('.text-data');
+                    
+                    detailsHTML += `
+                        <div class="flex justify-between">
+                            <span class="text-sm text-text-secondary">Cliente:</span>
+                            <span class="text-sm font-medium text-text-primary">${customerInfo ? customerInfo.textContent.replace('Cliente: ', '') : 'N/A'}</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-sm text-text-secondary">Tiempo ocupada:</span>
+                            <span class="text-sm font-medium text-text-primary">${timeInfo ? timeInfo.textContent.replace('Tiempo: ', '') : 'N/A'}</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-sm text-text-secondary">Total pedido:</span>
+                            <span class="text-sm font-medium text-data">${orderInfo ? orderInfo.textContent : '$0.00'}</span>
+                        </div>
+                    `;
+                }
+                
+                detailsHTML += '</div>';
+                
+                document.getElementById('tableDetailsContent').innerHTML = detailsHTML;
+                document.getElementById('tableDetailsModal').classList.remove('hidden');
+                document.getElementById('tableDetailsModal').classList.add('flex');
+            }
+            hideContextMenu();
+        }
+
+        // Helper functions for modal
+        function getZoneName(zone) {
+            const zoneNames = {
+                'terraza': 'Terraza',
+                'piso1': 'Piso 1',
+                'piso2': 'Piso 2'
+            };
+            return zoneNames[zone] || zone;
+        }
+
+        function getStatusText(status) {
+            const statusTexts = {
+                'free': 'Disponible',
+                'occupied': 'Ocupada',
+                'maintenance': 'Mantenimiento',
+                'reserved': 'Reservada'
+            };
+            return statusTexts[status] || status;
+        }
+
+        function getStatusColor(status) {
+            const statusColors = {
+                'free': 'text-success-600',
+                'occupied': 'text-error-600',
+                'maintenance': 'text-warning-600',
+                'reserved': 'text-accent-600'
+            };
+            return statusColors[status] || 'text-text-primary';
+        }
+
+        function closeTableModal() {
+            document.getElementById('tableDetailsModal').classList.add('hidden');
+            document.getElementById('tableDetailsModal').classList.remove('flex');
+        }
+
+        function editTableStatus() {
+            alert(`Editando estado de Mesa ${currentContextTable}`);
+            closeTableModal();
+        }
+
+        // Bulk actions
+        function liberateAllTables() {
+            if (confirm('¿Estás seguro de que deseas liberar todas las mesas ocupadas?')) {
+                document.querySelectorAll('.table-card[data-status="occupied"]').forEach(tableCard => {
+                    const tableId = tableCard.dataset.table;
+                    
+                    // Update table status
+                    tableCard.dataset.status = 'free';
+                    tableCard.classList.remove('border-error-500');
+                    tableCard.classList.add('border-success-500');
+                    
+                    // Update visual indicators
+                    const statusDot = tableCard.querySelector('.w-4');
+                    statusDot.classList.remove('bg-error-500');
+                    statusDot.classList.add('bg-success-500');
+                    
+                    // Update content
+                    const statusText = tableCard.querySelector('.text-sm.font-medium');
+                    statusText.textContent = 'Disponible';
+                    statusText.classList.remove('text-error-600');
+                    statusText.classList.add('text-success-600');
+                    
+                    // Update info section
+                    const infoContainer = tableCard.querySelector('.space-y-2');
+                    const capacity = tableCard.querySelector('.text-xs.text-text-secondary').textContent.split(' personas')[0] + ' personas';
+                    infoContainer.innerHTML = `
+                        <div class="flex items-center justify-between">
+                            <span class="text-sm text-success-600 font-medium">Disponible</span>
+                            <span class="text-xs text-text-secondary">${capacity}</span>
+                        </div>
+                        <div class="text-xs text-text-secondary">
+                            <i class="fas fa-clock mr-1"></i>Última limpieza: ${new Date().toLocaleTimeString('es-ES', {hour: '2-digit', minute: '2-digit'})}
+                        </div>
+                    `;
+                    
+                    // Update bottom status
+                    const bottomStatus = tableCard.querySelector('.mt-3 .flex');
+                    bottomStatus.innerHTML = `
+                        <span class="text-xs text-text-secondary">Estado:</span>
+                        <span class="text-xs bg-success-100 text-success-700 px-2 py-1 rounded-full">Libre</span>
+                    `;
+                });
+                
+                updateZoneStatistics('all');
+                alert('Todas las mesas han sido liberadas');
+            }
+        }
+
+        function refreshZones() {
+            // Simulate refresh with loading state
+            const refreshBtn = document.querySelector('button[onclick="refreshZones()"]');
+            const originalHTML = refreshBtn.innerHTML;
+            
+            refreshBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Actualizando...';
+            refreshBtn.disabled = true;
+            
+            setTimeout(() => {
+                refreshBtn.innerHTML = originalHTML;
+                refreshBtn.disabled = false;
+                updateZoneStatistics('all');
+                alert('Zonas actualizadas correctamente');
+            }, 1500);
+        }
+
+        // Drag and drop functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add drag and drop event listeners
+            document.querySelectorAll('.table-card').forEach(table => {
+                table.addEventListener('dragstart', handleDragStart);
+                table.addEventListener('dragover', handleDragOver);
+                table.addEventListener('drop', handleDrop);
+                table.addEventListener('dragend', handleDragEnd);
+            });
+
+            // Initialize statistics
+            updateZoneStatistics('all');
+        });
+
+        function handleDragStart(e) {
+            draggedTable = this;
+            this.style.opacity = '0.5';
+        }
+
+        function handleDragOver(e) {
+            e.preventDefault();
+            this.classList.add('bg-primary-50');
+        }
+
+        function handleDrop(e) {
+            e.preventDefault();
+            this.classList.remove('bg-primary-50');
+            
+            if (this !== draggedTable) {
+                // Here you would implement order transfer logic
+                alert(`Transfiriendo pedido de Mesa ${draggedTable.dataset.table} a Mesa ${this.dataset.table}`);
+            }
+        }
+
+        function handleDragEnd(e) {
+            this.style.opacity = '1';
+            document.querySelectorAll('.table-card').forEach(table => {
+                table.classList.remove('bg-primary-50');
+            });
+        }
+
+        // Hide context menu when clicking outside
+        document.addEventListener('click', function(e) {
+            if (!e.target.closest('#tableContextMenu') && !e.target.closest('button[onclick^="showTableMenu"]')) {
+                hideContextMenu();
+            }
+        });
+    </script>
+<script id="dhws-dataInjector" src="../public/dhws-data-injector.js"></script>
+</body>
+</html>

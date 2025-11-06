@@ -1,0 +1,691 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Whankoos POS Pro - Gestión de Inventario</title>
+    <link rel="stylesheet" href="../css/main.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  
+  <script type="module" src="https://static.rocket.new/rocket-web.js?_cfg=https%3A%2F%2Fwhankoosp1201back.builtwithrocket.new&_be=https%3A%2F%2Fapplication.rocket.new&_v=0.1.9"></script>
+  <script type="module" src="https://static.rocket.new/rocket-shot.js?v=0.0.1"></script>
+  </head>
+<body class="bg-background min-h-screen">
+    <!-- Header -->
+    <header class="bg-white shadow-card border-b border-border">
+        <div class="max-w-full mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <!-- Logo -->
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 bg-gradient-to-br from-primary-500 to-secondary-600 rounded-lg flex items-center justify-center">
+                        <i class="fas fa-pizza-slice text-white text-lg"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-xl font-bold text-text-primary">Whankoos POS Pro</h1>
+                        <p class="text-sm text-text-secondary">Gestión de Inventario</p>
+                    </div>
+                </div>
+
+                <!-- Navigation -->
+                <nav class="hidden md:flex items-center space-x-4">
+                    <a href="main_pos_dashboard.html" class="px-4 py-2 text-text-secondary hover:text-primary-500 transition-micro">
+                        <i class="fas fa-home mr-2"></i>Dashboard
+                    </a>
+                    <a href="inventory_management_dashboard.html" class="px-4 py-2 bg-primary-500 text-white rounded-button font-medium">
+                        <i class="fas fa-boxes mr-2"></i>Inventario
+                    </a>
+                    <a href="menu_item_editor.html" class="px-4 py-2 text-text-secondary hover:text-primary-500 transition-micro">
+                        <i class="fas fa-edit mr-2"></i>Menú
+                    </a>
+                    <a href="exchange_rate_management.html" class="px-4 py-2 text-text-secondary hover:text-primary-500 transition-micro">
+                        <i class="fas fa-exchange-alt mr-2"></i>Tasas
+                    </a>
+                    <a href="sales_history_analytics.html" class="px-4 py-2 text-text-secondary hover:text-primary-500 transition-micro">
+                        <i class="fas fa-chart-line mr-2"></i>Ventas
+                    </a>
+                </nav>
+
+                <!-- Mobile Menu Button -->
+                <button class="md:hidden p-2 text-text-secondary hover:text-primary-500" onclick="toggleMobileMenu()">
+                    <i class="fas fa-bars text-xl"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Mobile Navigation -->
+        <div id="mobileMenu" class="hidden md:hidden bg-white border-t border-border">
+            <div class="px-4 py-2 space-y-2">
+                <a href="main_pos_dashboard.html" class="block px-4 py-2 text-text-secondary hover:text-primary-500 transition-micro">
+                    <i class="fas fa-home mr-2"></i>Dashboard
+                </a>
+                <a href="inventory_management_dashboard.html" class="block px-4 py-2 bg-primary-500 text-white rounded-button font-medium">
+                    <i class="fas fa-boxes mr-2"></i>Inventario
+                </a>
+                <a href="menu_item_editor.html" class="block px-4 py-2 text-text-secondary hover:text-primary-500 transition-micro">
+                    <i class="fas fa-edit mr-2"></i>Editor de Menú
+                </a>
+                <a href="exchange_rate_management.html" class="block px-4 py-2 text-text-secondary hover:text-primary-500 transition-micro">
+                    <i class="fas fa-exchange-alt mr-2"></i>Tasas de Cambio
+                </a>
+                <a href="sales_history_analytics.html" class="block px-4 py-2 text-text-secondary hover:text-primary-500 transition-micro">
+                    <i class="fas fa-chart-line mr-2"></i>Historial de Ventas
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="flex-1 p-6">
+        <!-- Header Section -->
+        <div class="mb-6">
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between">
+                <div>
+                    <h1 class="text-2xl font-bold text-text-primary">Dashboard de Inventario</h1>
+                    <p class="text-text-secondary mt-1">Controla el stock de ingredientes en tiempo real</p>
+                </div>
+                <div class="mt-4 sm:mt-0 flex space-x-3">
+                    <button onclick="openAddIngredientModal()" class="bg-primary-500 text-white px-4 py-2 rounded-button font-medium hover:bg-primary-600 transition-micro">
+                        <i class="fas fa-plus mr-2"></i>Agregar Ingrediente
+                    </button>
+                    <button onclick="generateReorderReport()" class="border border-border text-text-primary px-4 py-2 rounded-button hover:bg-gray-50 transition-micro">
+                        <i class="fas fa-file-export mr-2"></i>Reporte Reorder
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Summary Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
+            <div class="bg-white rounded-lg shadow-card p-6 border border-border">
+                <div class="flex items-center">
+                    <div class="p-2 bg-success-50 rounded-lg">
+                        <i class="fas fa-box-open text-success-600 text-xl"></i>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-sm text-text-secondary">Stock Adecuado</p>
+                        <p class="text-2xl font-bold text-success-600" id="adequateStock">45</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-lg shadow-card p-6 border border-border">
+                <div class="flex items-center">
+                    <div class="p-2 bg-warning-50 rounded-lg">
+                        <i class="fas fa-exclamation-triangle text-warning-600 text-xl"></i>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-sm text-text-secondary">Stock Bajo</p>
+                        <p class="text-2xl font-bold text-warning-600" id="lowStock">8</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-lg shadow-card p-6 border border-border">
+                <div class="flex items-center">
+                    <div class="p-2 bg-error-50 rounded-lg">
+                        <i class="fas fa-times-circle text-error-600 text-xl"></i>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-sm text-text-secondary">Stock Crítico</p>
+                        <p class="text-2xl font-bold text-error-600" id="criticalStock">3</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-lg shadow-card p-6 border border-border">
+                <div class="flex items-center">
+                    <div class="p-2 bg-accent-50 rounded-lg">
+                        <i class="fas fa-dollar-sign text-accent-600 text-xl"></i>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-sm text-text-secondary">Valor Total</p>
+                        <p class="text-2xl font-bold text-accent-600" id="totalValue">$2,350</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Filters and Search -->
+        <div class="bg-white rounded-lg shadow-card p-4 mb-6 border border-border">
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-4 sm:space-y-0">
+                <div class="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-4">
+                    <div class="relative">
+                        <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-text-secondary"></i>
+                        <input type="text" id="searchInput" placeholder="Buscar ingredientes..." 
+                               class="pl-10 pr-4 py-2 border border-border rounded-button focus:outline-none focus:ring-2 focus:ring-primary-500 w-full sm:w-80">
+                    </div>
+                    <select id="categoryFilter" class="px-3 py-2 border border-border rounded-button focus:outline-none focus:ring-2 focus:ring-primary-500">
+                        <option value="">Todas las categorías</option>
+                        <option value="carnes">Carnes</option>
+                        <option value="vegetales">Vegetales</option>
+                        <option value="quesos">Quesos</option>
+                        <option value="salsas">Salsas</option>
+                        <option value="especias">Especias</option>
+                        <option value="bebidas">Bebidas</option>
+                    </select>
+                    <select id="statusFilter" class="px-3 py-2 border border-border rounded-button focus:outline-none focus:ring-2 focus:ring-primary-500">
+                        <option value="">Todos los estados</option>
+                        <option value="adequate">Stock Adecuado</option>
+                        <option value="low">Stock Bajo</option>
+                        <option value="critical">Stock Crítico</option>
+                    </select>
+                </div>
+                <button onclick="exportInventory()" class="bg-accent-500 text-white px-4 py-2 rounded-button font-medium hover:bg-accent-600 transition-micro">
+                    <i class="fas fa-download mr-2"></i>Exportar CSV
+                </button>
+            </div>
+        </div>
+
+        <!-- Inventory Table -->
+        <div class="bg-white rounded-lg shadow-card border border-border">
+            <div class="overflow-x-auto">
+                <table class="w-full">
+                    <thead class="bg-gray-50 border-b border-border">
+                        <tr>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-text-secondary uppercase tracking-wider">Ingrediente</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-text-secondary uppercase tracking-wider">Categoría</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-text-secondary uppercase tracking-wider">Stock Actual</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-text-secondary uppercase tracking-wider">Mínimo</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-text-secondary uppercase tracking-wider">Proveedor</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-text-secondary uppercase tracking-wider">Último Restock</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-text-secondary uppercase tracking-wider">Estado</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-text-secondary uppercase tracking-wider">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="inventoryTable" class="bg-white divide-y divide-border">
+                        <!-- Inventory items will be dynamically loaded here -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <!-- Add Ingredient Modal -->
+    <div id="addIngredientModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+        <div class="bg-white rounded-lg p-6 w-full max-w-lg mx-4 shadow-floating max-h-[90vh] overflow-y-auto">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-lg font-semibold text-text-primary">Agregar Nuevo Ingrediente</h3>
+                <button onclick="closeAddIngredientModal()" class="text-text-secondary hover:text-text-primary transition-micro">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+
+            <form id="addIngredientForm" class="space-y-4">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-text-primary mb-2">Nombre del Ingrediente</label>
+                        <input type="text" id="ingredientName" required class="w-full px-3 py-2 border border-border rounded-button focus:outline-none focus:ring-2 focus:ring-primary-500" placeholder="Ej: Queso Mozzarella">
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-text-primary mb-2">Categoría</label>
+                        <select id="ingredientCategory" required class="w-full px-3 py-2 border border-border rounded-button focus:outline-none focus:ring-2 focus:ring-primary-500">
+                            <option value="">Seleccionar categoría</option>
+                            <option value="carnes">Carnes</option>
+                            <option value="vegetales">Vegetales</option>
+                            <option value="quesos">Quesos</option>
+                            <option value="salsas">Salsas</option>
+                            <option value="especias">Especias</option>
+                            <option value="bebidas">Bebidas</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-text-primary mb-2">Stock Initial</label>
+                        <input type="number" id="initialStock" required min="0" step="0.1" class="w-full px-3 py-2 border border-border rounded-button focus:outline-none focus:ring-2 focus:ring-primary-500" placeholder="100">
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-text-primary mb-2">Stock Mínimo</label>
+                        <input type="number" id="minimumStock" required min="0" step="0.1" class="w-full px-3 py-2 border border-border rounded-button focus:outline-none focus:ring-2 focus:ring-primary-500" placeholder="20">
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-text-primary mb-2">Unidad</label>
+                        <select id="unit" required class="w-full px-3 py-2 border border-border rounded-button focus:outline-none focus:ring-2 focus:ring-primary-500">
+                            <option value="">Seleccionar unidad</option>
+                            <option value="kg">Kilogramos (kg)</option>
+                            <option value="g">Gramos (g)</option>
+                            <option value="l">Litros (l)</option>
+                            <option value="ml">Mililitros (ml)</option>
+                            <option value="unidades">Unidades</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-text-primary mb-2">Proveedor</label>
+                    <input type="text" id="supplier" required class="w-full px-3 py-2 border border-border rounded-button focus:outline-none focus:ring-2 focus:ring-primary-500" placeholder="Ej: Distribuidora Central">
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-text-primary mb-2">Costo por Unidad (USD)</label>
+                    <input type="number" id="unitCost" required min="0" step="0.01" class="w-full px-3 py-2 border border-border rounded-button focus:outline-none focus:ring-2 focus:ring-primary-500" placeholder="2.50">
+                </div>
+
+                <div class="flex space-x-3 pt-4">
+                    <button type="submit" class="flex-1 bg-primary-500 text-white py-2 rounded-button font-medium hover:bg-primary-600 transition-micro">
+                        <i class="fas fa-save mr-2"></i>Guardar Ingrediente
+                    </button>
+                    <button type="button" onclick="closeAddIngredientModal()" class="flex-1 border border-border text-text-primary py-2 rounded-button hover:bg-gray-50 transition-micro">
+                        Cancelar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Stock Adjustment Modal -->
+    <div id="stockModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+        <div class="bg-white rounded-lg p-6 w-full max-w-md mx-4 shadow-floating">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-lg font-semibold text-text-primary">Ajustar Stock</h3>
+                <button onclick="closeStockModal()" class="text-text-secondary hover:text-text-primary transition-micro">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-text-primary mb-2">Ingrediente</label>
+                    <input type="text" id="stockModalIngredient" readonly class="w-full px-3 py-2 border border-border rounded-button bg-gray-50">
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-text-primary mb-2">Stock Actual</label>
+                    <input type="text" id="currentStockDisplay" readonly class="w-full px-3 py-2 border border-border rounded-button bg-gray-50">
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-text-primary mb-2">Nuevo Stock</label>
+                    <input type="number" id="newStock" min="0" step="0.1" class="w-full px-3 py-2 border border-border rounded-button focus:outline-none focus:ring-2 focus:ring-primary-500">
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-text-primary mb-2">Motivo del Ajuste</label>
+                    <select id="adjustmentReason" class="w-full px-3 py-2 border border-border rounded-button focus:outline-none focus:ring-2 focus:ring-primary-500">
+                        <option value="restock">Restock de Proveedor</option>
+                        <option value="correction">Corrección de Inventario</option>
+                        <option value="waste">Desperdicio/Merma</option>
+                        <option value="transfer">Transferencia</option>
+                        <option value="other">Otro</option>
+                    </select>
+                </div>
+
+                <div class="flex space-x-3 pt-4">
+                    <button onclick="updateStock()" class="flex-1 bg-primary-500 text-white py-2 rounded-button font-medium hover:bg-primary-600 transition-micro">
+                        <i class="fas fa-check mr-2"></i>Actualizar
+                    </button>
+                    <button onclick="closeStockModal()" class="flex-1 border border-border text-text-primary py-2 rounded-button hover:bg-gray-50 transition-micro">
+                        Cancelar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Sample inventory data
+        let inventory = [
+            { id: 1, name: "Queso Mozzarella", category: "quesos", stock: 15.5, minimum: 10, unit: "kg", supplier: "Lácteos del Norte", lastRestock: "2024-10-20", unitCost: 8.50 },
+            { id: 2, name: "Pepperoni", category: "carnes", stock: 8.2, minimum: 5, unit: "kg", supplier: "Carnes Premium", lastRestock: "2024-10-18", unitCost: 12.00 },
+            { id: 3, name: "Masa Pizza", category: "especias", stock: 25, minimum: 15, unit: "kg", supplier: "Harinas Selectas", lastRestock: "2024-10-21", unitCost: 3.50 },
+            { id: 4, name: "Salsa de Tomate", category: "salsas", stock: 3.5, minimum: 5, unit: "l", supplier: "Conservas La Italiana", lastRestock: "2024-10-15", unitCost: 4.20 },
+            { id: 5, name: "Champiñones", category: "vegetales", stock: 6.8, minimum: 8, unit: "kg", supplier: "Verduras Frescas", lastRestock: "2024-10-19", unitCost: 6.80 },
+            { id: 6, name: "Cebolla", category: "vegetales", stock: 12.3, minimum: 10, unit: "kg", supplier: "Verduras Frescas", lastRestock: "2024-10-22", unitCost: 2.10 },
+            { id: 7, name: "Piña", category: "vegetales", stock: 4.5, minimum: 6, unit: "kg", supplier: "Frutas Tropicales", lastRestock: "2024-10-17", unitCost: 3.80 },
+            { id: 8, name: "Jamón", category: "carnes", stock: 7.2, minimum: 8, unit: "kg", supplier: "Embutidos Gourmet", lastRestock: "2024-10-20", unitCost: 9.50 },
+            { id: 9, name: "Pollo", category: "carnes", stock: 18.5, minimum: 12, unit: "kg", supplier: "Avícola del Campo", lastRestock: "2024-10-21", unitCost: 5.20 },
+            { id: 10, name: "Coca Cola", category: "bebidas", stock: 2, minimum: 12, unit: "unidades", supplier: "Distribuidora Refrescos", lastRestock: "2024-10-10", unitCost: 1.50 }
+        ];
+
+        let currentEditingId = null;
+
+        // Mobile menu toggle
+        function toggleMobileMenu() {
+            const menu = document.getElementById('mobileMenu');
+            menu.classList.toggle('hidden');
+        }
+
+        // Initialize inventory display
+        function initInventory() {
+            renderInventoryTable();
+            updateSummaryCards();
+            setupFilters();
+        }
+
+        // Render inventory table
+        function renderInventoryTable(data = inventory) {
+            const tbody = document.getElementById('inventoryTable');
+            
+            tbody.innerHTML = data.map(item => {
+                const status = getStockStatus(item);
+                const statusBadge = getStatusBadge(status);
+                
+                return `
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="flex items-center">
+                                <div class="text-sm font-medium text-text-primary">${item.name}</div>
+                            </div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <span class="px-2 py-1 text-xs font-medium bg-gray-100 text-gray-800 rounded-full">${item.category}</span>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="text-sm text-text-primary">${item.stock} ${item.unit}</div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="text-sm text-text-secondary">${item.minimum} ${item.unit}</div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="text-sm text-text-primary">${item.supplier}</div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="text-sm text-text-secondary">${formatDate(item.lastRestock)}</div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            ${statusBadge}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm space-x-2">
+                            <button onclick="openStockModal(${item.id})" class="text-primary-600 hover:text-primary-900 transition-micro">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button onclick="deleteIngredient(${item.id})" class="text-error-600 hover:text-error-900 transition-micro">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        // Get stock status
+        function getStockStatus(item) {
+            if (item.stock <= item.minimum * 0.5) return 'critical';
+            if (item.stock <= item.minimum) return 'low';
+            return 'adequate';
+        }
+
+        // Get status badge HTML
+        function getStatusBadge(status) {
+            const badges = {
+                adequate: '<span class="px-2 py-1 text-xs font-medium bg-success-100 text-success-800 rounded-full">Adecuado</span>',
+                low: '<span class="px-2 py-1 text-xs font-medium bg-warning-100 text-warning-800 rounded-full">Bajo</span>',
+                critical: '<span class="px-2 py-1 text-xs font-medium bg-error-100 text-error-800 rounded-full">Crítico</span>'
+            };
+            return badges[status];
+        }
+
+        // Update summary cards
+        function updateSummaryCards() {
+            const adequate = inventory.filter(item => getStockStatus(item) === 'adequate').length;
+            const low = inventory.filter(item => getStockStatus(item) === 'low').length;
+            const critical = inventory.filter(item => getStockStatus(item) === 'critical').length;
+            const totalValue = inventory.reduce((sum, item) => sum + (item.stock * item.unitCost), 0);
+
+            document.getElementById('adequateStock').textContent = adequate;
+            document.getElementById('lowStock').textContent = low;
+            document.getElementById('criticalStock').textContent = critical;
+            document.getElementById('totalValue').textContent = `$${totalValue.toFixed(2)}`;
+        }
+
+        // Setup filters
+        function setupFilters() {
+            const searchInput = document.getElementById('searchInput');
+            const categoryFilter = document.getElementById('categoryFilter');
+            const statusFilter = document.getElementById('statusFilter');
+
+            [searchInput, categoryFilter, statusFilter].forEach(element => {
+                element.addEventListener('input', filterInventory);
+            });
+        }
+
+        // Filter inventory
+        function filterInventory() {
+            const search = document.getElementById('searchInput').value.toLowerCase();
+            const category = document.getElementById('categoryFilter').value;
+            const status = document.getElementById('statusFilter').value;
+
+            let filtered = inventory.filter(item => {
+                const matchesSearch = item.name.toLowerCase().includes(search) || 
+                                    item.supplier.toLowerCase().includes(search);
+                const matchesCategory = !category || item.category === category;
+                const matchesStatus = !status || getStockStatus(item) === status;
+                
+                return matchesSearch && matchesCategory && matchesStatus;
+            });
+
+            renderInventoryTable(filtered);
+        }
+
+        // Open add ingredient modal
+        function openAddIngredientModal() {
+            document.getElementById('addIngredientModal').classList.remove('hidden');
+            document.getElementById('addIngredientModal').classList.add('flex');
+        }
+
+        // Close add ingredient modal
+        function closeAddIngredientModal() {
+            document.getElementById('addIngredientModal').classList.add('hidden');
+            document.getElementById('addIngredientModal').classList.remove('flex');
+            document.getElementById('addIngredientForm').reset();
+        }
+
+        // Add new ingredient
+        document.getElementById('addIngredientForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = {
+                id: Date.now(),
+                name: document.getElementById('ingredientName').value,
+                category: document.getElementById('ingredientCategory').value,
+                stock: parseFloat(document.getElementById('initialStock').value),
+                minimum: parseFloat(document.getElementById('minimumStock').value),
+                unit: document.getElementById('unit').value,
+                supplier: document.getElementById('supplier').value,
+                lastRestock: new Date().toISOString().split('T')[0],
+                unitCost: parseFloat(document.getElementById('unitCost').value)
+            };
+
+            inventory.push(formData);
+            renderInventoryTable();
+            updateSummaryCards();
+            closeAddIngredientModal();
+            
+            // Show success message
+            alert('Ingrediente agregado exitosamente');
+        });
+
+        // Open stock modal
+        function openStockModal(id) {
+            const item = inventory.find(i => i.id === id);
+            if (!item) return;
+
+            currentEditingId = id;
+            document.getElementById('stockModalIngredient').value = item.name;
+            document.getElementById('currentStockDisplay').value = `${item.stock} ${item.unit}`;
+            document.getElementById('newStock').value = item.stock;
+            
+            document.getElementById('stockModal').classList.remove('hidden');
+            document.getElementById('stockModal').classList.add('flex');
+        }
+
+        // Close stock modal
+        function closeStockModal() {
+            document.getElementById('stockModal').classList.add('hidden');
+            document.getElementById('stockModal').classList.remove('flex');
+            currentEditingId = null;
+        }
+
+        // Update stock
+        function updateStock() {
+            if (!currentEditingId) return;
+
+            const item = inventory.find(i => i.id === currentEditingId);
+            if (!item) return;
+
+            const newStock = parseFloat(document.getElementById('newStock').value);
+            const reason = document.getElementById('adjustmentReason').value;
+            
+            if (isNaN(newStock) || newStock < 0) {
+                alert('Por favor ingresa un valor válido para el stock');
+                return;
+            }
+
+            item.stock = newStock;
+            if (reason === 'restock') {
+                item.lastRestock = new Date().toISOString().split('T')[0];
+            }
+
+            renderInventoryTable();
+            updateSummaryCards();
+            closeStockModal();
+            
+            alert('Stock actualizado exitosamente');
+        }
+
+        // Delete ingredient
+        function deleteIngredient(id) {
+            if (confirm('¿Estás seguro de eliminar este ingrediente?')) {
+                inventory = inventory.filter(item => item.id !== id);
+                renderInventoryTable();
+                updateSummaryCards();
+                alert('Ingrediente eliminado exitosamente');
+            }
+        }
+
+        // Generate reorder report
+        function generateReorderReport() {
+            const lowStockItems = inventory.filter(item => getStockStatus(item) === 'low' || getStockStatus(item) === 'critical');
+            
+            if (lowStockItems.length === 0) {
+                alert('No hay ingredientes que requieran reabastecimiento');
+                return;
+            }
+
+            let report = 'REPORTE DE REABASTECIMIENTO\n';
+            report += '================================\n\n';
+            
+            lowStockItems.forEach(item => {
+                const suggestedOrder = Math.ceil((item.minimum * 2) - item.stock);
+                report += `${item.name}\n`;
+                report += `  Stock Actual: ${item.stock} ${item.unit}\n`;
+                report += `  Stock Mínimo: ${item.minimum} ${item.unit}\n`;
+                report += `  Cantidad Sugerida: ${suggestedOrder} ${item.unit}\n`;
+                report += `  Proveedor: ${item.supplier}\n`;
+                report += `  Costo Estimado: $${(suggestedOrder * item.unitCost).toFixed(2)}\n\n`;
+            });
+
+            const totalCost = lowStockItems.reduce((sum, item) => {
+                const suggestedOrder = Math.ceil((item.minimum * 2) - item.stock);
+                return sum + (suggestedOrder * item.unitCost);
+            }, 0);
+
+            report += `COSTO TOTAL ESTIMADO: $${totalCost.toFixed(2)}`;
+
+            // Create downloadable file
+            const blob = new Blob([report], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `reporte_reabastecimiento_${new Date().toISOString().split('T')[0]}.txt`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        // Export inventory to CSV
+        function exportInventory() {
+            let csv = 'Ingrediente,Categoría,Stock Actual,Unidad,Mínimo,Proveedor,Último Restock,Estado,Valor Total\n';
+            
+            inventory.forEach(item => {
+                const status = getStockStatus(item) === 'adequate' ? 'Adecuado' : 
+                              getStockStatus(item) === 'low' ? 'Bajo' : 'Crítico';
+                const totalValue = (item.stock * item.unitCost).toFixed(2);
+                
+                csv += `"${item.name}","${item.category}",${item.stock},"${item.unit}",${item.minimum},"${item.supplier}","${item.lastRestock}","${status}",${totalValue}\n`;
+            });
+
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `inventario_${new Date().toISOString().split('T')[0]}.csv`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        // Format date
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            return date.toLocaleDateString('es-ES');
+        }
+
+        // Simulate ingredient consumption when order is processed
+        function processIngredientConsumption(orderItems) {
+            const ingredientRecipes = {
+                'Whankoos 440': {
+                    'P': { 'Queso Mozzarella': 0.15, 'Pepperoni': 0.08, 'Champiñones': 0.05, 'Masa Pizza': 0.25, 'Salsa de Tomate': 0.08 },
+                    'M': { 'Queso Mozzarella': 0.25, 'Pepperoni': 0.12, 'Champiñones': 0.08, 'Masa Pizza': 0.35, 'Salsa de Tomate': 0.12 },
+                    'G': { 'Queso Mozzarella': 0.35, 'Pepperoni': 0.18, 'Champiñones': 0.12, 'Masa Pizza': 0.45, 'Salsa de Tomate': 0.18 }
+                },
+                'Chicken Cream': {
+                    'P': { 'Queso Mozzarella': 0.15, 'Pollo': 0.12, 'Cebolla': 0.03, 'Masa Pizza': 0.25 },
+                    'M': { 'Queso Mozzarella': 0.25, 'Pollo': 0.18, 'Cebolla': 0.05, 'Masa Pizza': 0.35 },
+                    'G': { 'Queso Mozzarella': 0.35, 'Pollo': 0.25, 'Cebolla': 0.08, 'Masa Pizza': 0.45 }
+                },
+                'Pepperoni': {
+                    'P': { 'Queso Mozzarella': 0.15, 'Pepperoni': 0.1, 'Masa Pizza': 0.25, 'Salsa de Tomate': 0.08 },
+                    'M': { 'Queso Mozzarella': 0.25, 'Pepperoni': 0.15, 'Masa Pizza': 0.35, 'Salsa de Tomate': 0.12 },
+                    'G': { 'Queso Mozzarella': 0.35, 'Pepperoni': 0.22, 'Masa Pizza': 0.45, 'Salsa de Tomate': 0.18 }
+                },
+                'Hawaiana': {
+                    'P': { 'Queso Mozzarella': 0.15, 'Jamón': 0.08, 'Piña': 0.06, 'Masa Pizza': 0.25, 'Salsa de Tomate': 0.08 },
+                    'M': { 'Queso Mozzarella': 0.25, 'Jamón': 0.12, 'Piña': 0.09, 'Masa Pizza': 0.35, 'Salsa de Tomate': 0.12 },
+                    'G': { 'Queso Mozzarella': 0.35, 'Jamón': 0.18, 'Piña': 0.12, 'Masa Pizza': 0.45, 'Salsa de Tomate': 0.18 }
+                },
+                'Coca Cola': { '': { 'Coca Cola': 1 } },
+                'Agua': { '': { } }, // No ingredients tracked for water
+                'Jugo Naranja': { '': { } } // No ingredients tracked for juice
+            };
+
+            orderItems.forEach(orderItem => {
+                const recipe = ingredientRecipes[orderItem.name];
+                if (recipe) {
+                    const sizeRecipe = recipe[orderItem.size] || recipe[''];
+                    if (sizeRecipe) {
+                        Object.entries(sizeRecipe).forEach(([ingredientName, quantity]) => {
+                            const ingredient = inventory.find(i => i.name === ingredientName);
+                            if (ingredient) {
+                                ingredient.stock = Math.max(0, ingredient.stock - (quantity * orderItem.quantity));
+                            }
+                        });
+                    }
+                }
+            });
+
+            renderInventoryTable();
+            updateSummaryCards();
+        }
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', initInventory);
+
+        // Listen for order processing from other pages
+        window.addEventListener('storage', function(e) {
+            if (e.key === 'whankoos_order_processed') {
+                const orderData = JSON.parse(e.newValue);
+                processIngredientConsumption(orderData.items);
+                localStorage.removeItem('whankoos_order_processed'); // Clean up
+            }
+        });
+    </script>
+<script id="dhws-dataInjector" src="../public/dhws-data-injector.js"></script>
+</body>
+</html>

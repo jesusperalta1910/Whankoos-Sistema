@@ -1,0 +1,753 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Whankoos POS Pro - Editor de Menú</title>
+    <link rel="stylesheet" href="../css/main.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  
+  <script type="module" src="https://static.rocket.new/rocket-web.js?_cfg=https%3A%2F%2Fwhankoosp1201back.builtwithrocket.new&_be=https%3A%2F%2Fapplication.rocket.new&_v=0.1.9"></script>
+  <script type="module" src="https://static.rocket.new/rocket-shot.js?v=0.0.1"></script>
+  </head>
+<body class="bg-background min-h-screen">
+    <!-- Header -->
+    <header class="bg-white shadow-card border-b border-border">
+        <div class="max-w-full mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <!-- Logo -->
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 bg-gradient-to-br from-primary-500 to-secondary-600 rounded-lg flex items-center justify-center">
+                        <i class="fas fa-pizza-slice text-white text-lg"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-xl font-bold text-text-primary">Whankoos POS Pro</h1>
+                        <p class="text-sm text-text-secondary">Editor de Menú</p>
+                    </div>
+                </div>
+
+                <!-- Navigation -->
+                <nav class="hidden md:flex items-center space-x-4">
+                    <a href="main_pos_dashboard.html" class="px-4 py-2 text-text-secondary hover:text-primary-500 transition-micro">
+                        <i class="fas fa-home mr-2"></i>Dashboard
+                    </a>
+                    <a href="inventory_management_dashboard.html" class="px-4 py-2 text-text-secondary hover:text-primary-500 transition-micro">
+                        <i class="fas fa-boxes mr-2"></i>Inventario
+                    </a>
+                    <a href="menu_item_editor.html" class="px-4 py-2 bg-primary-500 text-white rounded-button font-medium">
+                        <i class="fas fa-edit mr-2"></i>Menú
+                    </a>
+                    <a href="exchange_rate_management.html" class="px-4 py-2 text-text-secondary hover:text-primary-500 transition-micro">
+                        <i class="fas fa-exchange-alt mr-2"></i>Tasas
+                    </a>
+                    <a href="sales_history_analytics.html" class="px-4 py-2 text-text-secondary hover:text-primary-500 transition-micro">
+                        <i class="fas fa-chart-line mr-2"></i>Ventas
+                    </a>
+                </nav>
+
+                <!-- Mobile Menu Button -->
+                <button class="md:hidden p-2 text-text-secondary hover:text-primary-500" onclick="toggleMobileMenu()">
+                    <i class="fas fa-bars text-xl"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Mobile Navigation -->
+        <div id="mobileMenu" class="hidden md:hidden bg-white border-t border-border">
+            <div class="px-4 py-2 space-y-2">
+                <a href="main_pos_dashboard.html" class="block px-4 py-2 text-text-secondary hover:text-primary-500 transition-micro">
+                    <i class="fas fa-home mr-2"></i>Dashboard
+                </a>
+                <a href="inventory_management_dashboard.html" class="block px-4 py-2 text-text-secondary hover:text-primary-500 transition-micro">
+                    <i class="fas fa-boxes mr-2"></i>Inventario
+                </a>
+                <a href="menu_item_editor.html" class="block px-4 py-2 bg-primary-500 text-white rounded-button font-medium">
+                    <i class="fas fa-edit mr-2"></i>Editor de Menú
+                </a>
+                <a href="exchange_rate_management.html" class="block px-4 py-2 text-text-secondary hover:text-primary-500 transition-micro">
+                    <i class="fas fa-exchange-alt mr-2"></i>Tasas de Cambio
+                </a>
+                <a href="sales_history_analytics.html" class="block px-4 py-2 text-text-secondary hover:text-primary-500 transition-micro">
+                    <i class="fas fa-chart-line mr-2"></i>Historial de Ventas
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="flex-1 flex">
+        <!-- Left Panel - Menu Items List -->
+        <div class="w-1/3 bg-white border-r border-border flex flex-col">
+            <!-- Header -->
+            <div class="p-4 border-b border-border">
+                <div class="flex items-center justify-between mb-3">
+                    <h2 class="text-lg font-semibold text-text-primary">Elementos del Menú</h2>
+                    <button onclick="createNewItem()" class="bg-primary-500 text-white px-3 py-1 rounded-button text-sm hover:bg-primary-600 transition-micro">
+                        <i class="fas fa-plus mr-1"></i>Nuevo
+                    </button>
+                </div>
+                
+                <!-- Category Filter -->
+                <select id="categoryFilter" onchange="filterByCategory()" class="w-full px-3 py-2 border border-border rounded-button focus:outline-none focus:ring-2 focus:ring-primary-500">
+                    <option value="">Todas las categorías</option>
+                    <option value="pizzas">Pizzas</option>
+                    <option value="bebidas">Bebidas</option>
+                    <option value="otros">Otros/Platos</option>
+                </select>
+            </div>
+
+            <!-- Menu Items List -->
+            <div class="flex-1 overflow-y-auto p-4">
+                <div id="menuItemsList" class="space-y-3">
+                    <!-- Menu items will be dynamically loaded here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Panel - Item Editor -->
+        <div class="flex-1 bg-gray-50 flex flex-col">
+            <!-- Editor Header -->
+            <div class="p-6 bg-white border-b border-border">
+                <h2 class="text-xl font-semibold text-text-primary" id="editorTitle">Selecciona un elemento para editar</h2>
+            </div>
+
+            <!-- Editor Content -->
+            <div class="flex-1 overflow-y-auto p-6">
+                <div id="noSelection" class="text-center text-text-secondary py-16">
+                    <i class="fas fa-edit text-6xl mb-4 opacity-50"></i>
+                    <p class="text-lg">Selecciona un elemento del menú para comenzar a editar</p>
+                    <p class="text-sm">O crea un nuevo elemento usando el botón "Nuevo"</p>
+                </div>
+
+                <!-- Item Editor Form -->
+                <div id="itemEditor" class="hidden">
+                    <form id="itemForm" class="space-y-6">
+                        <!-- Basic Information -->
+                        <div class="bg-white rounded-lg p-6 shadow-card border border-border">
+                            <h3 class="text-lg font-semibold text-text-primary mb-4">Información Básica</h3>
+                            
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-text-primary mb-2">Nombre del Elemento</label>
+                                    <input type="text" id="itemName" required class="w-full px-3 py-2 border border-border rounded-button focus:outline-none focus:ring-2 focus:ring-primary-500" placeholder="Ej: Pizza Margherita">
+                                </div>
+                                
+                                <div>
+                                    <label class="block text-sm font-medium text-text-primary mb-2">Categoría</label>
+                                    <select id="itemCategory" required class="w-full px-3 py-2 border border-border rounded-button focus:outline-none focus:ring-2 focus:ring-primary-500">
+                                        <option value="">Seleccionar categoría</option>
+                                        <option value="pizzas">Pizzas</option>
+                                        <option value="bebidas">Bebidas</option>
+                                        <option value="otros">Otros/Platos</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="mt-4">
+                                <label class="block text-sm font-medium text-text-primary mb-2">Descripción</label>
+                                <textarea id="itemDescription" rows="3" class="w-full px-3 py-2 border border-border rounded-button focus:outline-none focus:ring-2 focus:ring-primary-500" placeholder="Describe los ingredientes y características del elemento"></textarea>
+                            </div>
+
+                            <div class="mt-4">
+                                <label class="block text-sm font-medium text-text-primary mb-2">URL de Imagen</label>
+                                <input type="url" id="itemImage" class="w-full px-3 py-2 border border-border rounded-button focus:outline-none focus:ring-2 focus:ring-primary-500" placeholder="https://images.unsplash.com/...">
+                            </div>
+
+                            <div class="mt-4 flex items-center space-x-4">
+                                <label class="flex items-center">
+                                    <input type="checkbox" id="itemAvailable" class="rounded border-border text-primary-600 focus:ring-primary-500">
+                                    <span class="ml-2 text-sm text-text-primary">Disponible en el menú</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Pricing Information -->
+                        <div class="bg-white rounded-lg p-6 shadow-card border border-border">
+                            <h3 class="text-lg font-semibold text-text-primary mb-4">Información de Precios</h3>
+                            
+                            <!-- Pizza Size Pricing -->
+                            <div id="pizzaPricing" class="hidden">
+                                <p class="text-sm text-text-secondary mb-4">Configure los precios para cada tamaño de pizza</p>
+                                
+                                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                    <div>
+                                        <label class="block text-sm font-medium text-text-primary mb-2">Precio Pequeño (P)</label>
+                                        <input type="number" id="priceSmall" min="0" step="0.01" class="w-full px-3 py-2 border border-border rounded-button focus:outline-none focus:ring-2 focus:ring-primary-500" placeholder="8.50">
+                                    </div>
+                                    
+                                    <div>
+                                        <label class="block text-sm font-medium text-text-primary mb-2">Precio Mediano (M)</label>
+                                        <input type="number" id="priceMedium" min="0" step="0.01" class="w-full px-3 py-2 border border-border rounded-button focus:outline-none focus:ring-2 focus:ring-primary-500" placeholder="12.00">
+                                    </div>
+                                    
+                                    <div>
+                                        <label class="block text-sm font-medium text-text-primary mb-2">Precio Grande (G)</label>
+                                        <input type="number" id="priceLarge" min="0" step="0.01" class="w-full px-3 py-2 border border-border rounded-button focus:outline-none focus:ring-2 focus:ring-primary-500" placeholder="15.50">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Single Price -->
+                            <div id="singlePricing" class="hidden">
+                                <p class="text-sm text-text-secondary mb-4">Configure el precio del elemento</p>
+                                
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div>
+                                        <label class="block text-sm font-medium text-text-primary mb-2">Precio (USD)</label>
+                                        <input type="number" id="itemPrice" min="0" step="0.01" class="w-full px-3 py-2 border border-border rounded-button focus:outline-none focus:ring-2 focus:ring-primary-500" placeholder="2.50">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Ingredient Association -->
+                        <div class="bg-white rounded-lg p-6 shadow-card border border-border">
+                            <h3 class="text-lg font-semibold text-text-primary mb-4">Asociación de Ingredientes</h3>
+                            <p class="text-sm text-text-secondary mb-4">Selecciona los ingredientes que se consumen al preparar este elemento</p>
+                            
+                            <!-- Pizza Size Ingredients -->
+                            <div id="pizzaIngredients" class="hidden">
+                                <div class="mb-4">
+                                    <label class="block text-sm font-medium text-text-primary mb-2">Ingredientes por Tamaño</label>
+                                    <div class="border border-border rounded-lg">
+                                        <!-- Size Tabs -->
+                                        <div class="flex border-b border-border">
+                                            <button type="button" class="size-tab px-4 py-2 text-sm font-medium bg-primary-500 text-white" data-size="small">Pequeño (P)</button>
+                                            <button type="button" class="size-tab px-4 py-2 text-sm font-medium text-text-secondary hover:text-primary-500" data-size="medium">Mediano (M)</button>
+                                            <button type="button" class="size-tab px-4 py-2 text-sm font-medium text-text-secondary hover:text-primary-500" data-size="large">Grande (G)</button>
+                                        </div>
+                                        
+                                        <!-- Size Content -->
+                                        <div class="p-4">
+                                            <div id="smallIngredients" class="size-content">
+                                                <div id="smallIngredientsContainer" class="space-y-2"></div>
+                                                <button type="button" onclick="addIngredientToSize('small')" class="mt-2 text-primary-500 hover:text-primary-600 text-sm">
+                                                    <i class="fas fa-plus mr-1"></i>Agregar Ingrediente
+                                                </button>
+                                            </div>
+                                            
+                                            <div id="mediumIngredients" class="size-content hidden">
+                                                <div id="mediumIngredientsContainer" class="space-y-2"></div>
+                                                <button type="button" onclick="addIngredientToSize('medium')" class="mt-2 text-primary-500 hover:text-primary-600 text-sm">
+                                                    <i class="fas fa-plus mr-1"></i>Agregar Ingrediente
+                                                </button>
+                                            </div>
+                                            
+                                            <div id="largeIngredients" class="size-content hidden">
+                                                <div id="largeIngredientsContainer" class="space-y-2"></div>
+                                                <button type="button" onclick="addIngredientToSize('large')" class="mt-2 text-primary-500 hover:text-primary-600 text-sm">
+                                                    <i class="fas fa-plus mr-1"></i>Agregar Ingrediente
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Single Item Ingredients -->
+                            <div id="singleIngredients" class="hidden">
+                                <div id="singleIngredientsContainer" class="space-y-2 mb-2"></div>
+                                <button type="button" onclick="addIngredientToSingle()" class="text-primary-500 hover:text-primary-600 text-sm">
+                                    <i class="fas fa-plus mr-1"></i>Agregar Ingrediente
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Action Buttons -->
+                        <div class="flex space-x-4">
+                            <button type="submit" class="bg-primary-500 text-white px-6 py-3 rounded-button font-medium hover:bg-primary-600 transition-micro">
+                                <i class="fas fa-save mr-2"></i>Guardar Cambios
+                            </button>
+                            <button type="button" onclick="duplicateItem()" class="border border-border text-text-primary px-6 py-3 rounded-button hover:bg-gray-50 transition-micro">
+                                <i class="fas fa-copy mr-2"></i>Duplicar
+                            </button>
+                            <button type="button" onclick="deleteCurrentItem()" class="bg-error-500 text-white px-6 py-3 rounded-button font-medium hover:bg-error-600 transition-micro">
+                                <i class="fas fa-trash mr-2"></i>Eliminar
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Sample menu items data
+        let menuItems = [
+            {
+                id: 1,
+                name: "Whankoos 440",
+                category: "pizzas",
+                description: "Masa, salsa, queso mozzarella, pepperoni, champiñones",
+                image: "https://images.unsplash.com/photo-1723380620249-6a949183830d",
+                available: true,
+                pricing: {
+                    small: 8.50,
+                    medium: 12.00,
+                    large: 15.50
+                },
+                ingredients: {
+                    small: [
+                        { name: "Queso Mozzarella", quantity: 0.15 },
+                        { name: "Pepperoni", quantity: 0.08 },
+                        { name: "Champiñones", quantity: 0.05 },
+                        { name: "Masa Pizza", quantity: 0.25 },
+                        { name: "Salsa de Tomate", quantity: 0.08 }
+                    ],
+                    medium: [
+                        { name: "Queso Mozzarella", quantity: 0.25 },
+                        { name: "Pepperoni", quantity: 0.12 },
+                        { name: "Champiñones", quantity: 0.08 },
+                        { name: "Masa Pizza", quantity: 0.35 },
+                        { name: "Salsa de Tomate", quantity: 0.12 }
+                    ],
+                    large: [
+                        { name: "Queso Mozzarella", quantity: 0.35 },
+                        { name: "Pepperoni", quantity: 0.18 },
+                        { name: "Champiñones", quantity: 0.12 },
+                        { name: "Masa Pizza", quantity: 0.45 },
+                        { name: "Salsa de Tomate", quantity: 0.18 }
+                    ]
+                }
+            },
+            {
+                id: 2,
+                name: "Chicken Cream",
+                category: "pizzas",
+                description: "Masa, salsa blanca, queso mozzarella, pollo, cebolla",
+                image: "https://images.unsplash.com/photo-1670227505925-6454fe4ce408",
+                available: true,
+                pricing: {
+                    small: 9.00,
+                    medium: 13.00,
+                    large: 16.50
+                },
+                ingredients: {
+                    small: [
+                        { name: "Queso Mozzarella", quantity: 0.15 },
+                        { name: "Pollo", quantity: 0.12 },
+                        { name: "Cebolla", quantity: 0.03 },
+                        { name: "Masa Pizza", quantity: 0.25 }
+                    ],
+                    medium: [
+                        { name: "Queso Mozzarella", quantity: 0.25 },
+                        { name: "Pollo", quantity: 0.18 },
+                        { name: "Cebolla", quantity: 0.05 },
+                        { name: "Masa Pizza", quantity: 0.35 }
+                    ],
+                    large: [
+                        { name: "Queso Mozzarella", quantity: 0.35 },
+                        { name: "Pollo", quantity: 0.25 },
+                        { name: "Cebolla", quantity: 0.08 },
+                        { name: "Masa Pizza", quantity: 0.45 }
+                    ]
+                }
+            },
+            {
+                id: 3,
+                name: "Coca Cola",
+                category: "bebidas",
+                description: "Bebida refrescante de cola",
+                image: "https://images.unsplash.com/photo-1581636625402-29b2a704ef13",
+                available: true,
+                pricing: {
+                    single: 2.50
+                },
+                ingredients: {
+                    single: [
+                        { name: "Coca Cola", quantity: 1 }
+                    ]
+                }
+            },
+            {
+                id: 4,
+                name: "Gyro",
+                category: "otros",
+                description: "Gyro tradicional con carne y vegetales",
+                image: "https://images.unsplash.com/photo-1734595954646-65d696a53814",
+                available: true,
+                pricing: {
+                    single: 6.50
+                },
+                ingredients: {
+                    single: [
+                        { name: "Carne Gyro", quantity: 0.2 },
+                        { name: "Pan Pita", quantity: 1 },
+                        { name: "Cebolla", quantity: 0.05 }
+                    ]
+                }
+            }
+        ];
+
+        let currentEditingItem = null;
+        let availableIngredients = [
+            "Queso Mozzarella", "Pepperoni", "Champiñones", "Masa Pizza", "Salsa de Tomate",
+            "Pollo", "Cebolla", "Piña", "Jamón", "Coca Cola", "Agua", "Jugo de Naranja",
+            "Carne Gyro", "Pan Pita", "Lechuga", "Tomate", "Salsa Blanca"
+        ];
+
+        // Mobile menu toggle
+        function toggleMobileMenu() {
+            const menu = document.getElementById('mobileMenu');
+            menu.classList.toggle('hidden');
+        }
+
+        // Initialize menu editor
+        function initMenuEditor() {
+            renderMenuItemsList();
+            setupSizeTabs();
+        }
+
+        // Render menu items list
+        function renderMenuItemsList(filteredItems = menuItems) {
+            const container = document.getElementById('menuItemsList');
+            
+            container.innerHTML = filteredItems.map(item => `
+                <div class="menu-item-card bg-surface border border-border rounded-lg p-4 cursor-pointer hover:shadow-md transition-smooth ${currentEditingItem && currentEditingItem.id === item.id ? 'ring-2 ring-primary-500' : ''}" 
+                     onclick="selectItem(${item.id})">
+                    <div class="flex items-center space-x-3">
+                        <img src="${item.image}" alt="${item.name}" class="w-12 h-12 rounded-lg object-cover"
+                             onerror="this.src='https://images.unsplash.com/photo-1584824486509-112e4181ff6b?q=80&w=2940&auto=format&fit=crop&ixlib=rb-4.0.3'">
+                        <div class="flex-1">
+                            <h3 class="font-medium text-text-primary">${item.name}</h3>
+                            <p class="text-sm text-text-secondary">${item.category}</p>
+                            <div class="flex items-center space-x-2 mt-1">
+                                <span class="text-xs ${item.available ? 'text-success-600' : 'text-error-600'}">${item.available ? 'Disponible' : 'No disponible'}</span>
+                                <span class="text-xs text-data">${getPriceDisplay(item)}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Get price display for item
+        function getPriceDisplay(item) {
+            if (item.category === 'pizzas') {
+                return `$${item.pricing.small} - $${item.pricing.large}`;
+            } else {
+                return `$${item.pricing.single}`;
+            }
+        }
+
+        // Filter by category
+        function filterByCategory() {
+            const category = document.getElementById('categoryFilter').value;
+            const filtered = category ? menuItems.filter(item => item.category === category) : menuItems;
+            renderMenuItemsList(filtered);
+        }
+
+        // Select item for editing
+        function selectItem(id) {
+            currentEditingItem = menuItems.find(item => item.id === id);
+            if (currentEditingItem) {
+                showItemEditor();
+                populateEditor();
+                renderMenuItemsList(); // Re-render to update selection
+            }
+        }
+
+        // Show item editor
+        function showItemEditor() {
+            document.getElementById('noSelection').classList.add('hidden');
+            document.getElementById('itemEditor').classList.remove('hidden');
+            document.getElementById('editorTitle').textContent = currentEditingItem ? `Editando: ${currentEditingItem.name}` : 'Crear Nuevo Elemento';
+        }
+
+        // Hide item editor
+        function hideItemEditor() {
+            document.getElementById('noSelection').classList.remove('hidden');
+            document.getElementById('itemEditor').classList.add('hidden');
+            currentEditingItem = null;
+            document.getElementById('editorTitle').textContent = 'Selecciona un elemento para editar';
+            renderMenuItemsList(); // Re-render to clear selection
+        }
+
+        // Populate editor with current item data
+        function populateEditor() {
+            if (!currentEditingItem) return;
+
+            const item = currentEditingItem;
+            
+            // Basic information
+            document.getElementById('itemName').value = item.name;
+            document.getElementById('itemCategory').value = item.category;
+            document.getElementById('itemDescription').value = item.description;
+            document.getElementById('itemImage').value = item.image;
+            document.getElementById('itemAvailable').checked = item.available;
+
+            // Show appropriate pricing section
+            togglePricingSection(item.category);
+
+            // Populate pricing
+            if (item.category === 'pizzas') {
+                document.getElementById('priceSmall').value = item.pricing.small;
+                document.getElementById('priceMedium').value = item.pricing.medium;
+                document.getElementById('priceLarge').value = item.pricing.large;
+            } else {
+                document.getElementById('itemPrice').value = item.pricing.single;
+            }
+
+            // Populate ingredients
+            populateIngredients();
+        }
+
+        // Toggle pricing section based on category
+        function togglePricingSection(category) {
+            const pizzaPricing = document.getElementById('pizzaPricing');
+            const singlePricing = document.getElementById('singlePricing');
+            const pizzaIngredients = document.getElementById('pizzaIngredients');
+            const singleIngredients = document.getElementById('singleIngredients');
+
+            if (category === 'pizzas') {
+                pizzaPricing.classList.remove('hidden');
+                singlePricing.classList.add('hidden');
+                pizzaIngredients.classList.remove('hidden');
+                singleIngredients.classList.add('hidden');
+            } else {
+                pizzaPricing.classList.add('hidden');
+                singlePricing.classList.remove('hidden');
+                pizzaIngredients.classList.add('hidden');
+                singleIngredients.classList.remove('hidden');
+            }
+        }
+
+        // Setup size tabs
+        function setupSizeTabs() {
+            document.querySelectorAll('.size-tab').forEach(tab => {
+                tab.addEventListener('click', function() {
+                    const size = this.dataset.size;
+                    
+                    // Update tab appearance
+                    document.querySelectorAll('.size-tab').forEach(t => {
+                        t.classList.remove('bg-primary-500', 'text-white');
+                        t.classList.add('text-text-secondary');
+                    });
+                    this.classList.add('bg-primary-500', 'text-white');
+                    this.classList.remove('text-text-secondary');
+                    
+                    // Show corresponding content
+                    document.querySelectorAll('.size-content').forEach(content => {
+                        content.classList.add('hidden');
+                    });
+                    document.getElementById(size + 'Ingredients').classList.remove('hidden');
+                });
+            });
+        }
+
+        // Populate ingredients
+        function populateIngredients() {
+            if (!currentEditingItem) return;
+
+            if (currentEditingItem.category === 'pizzas') {
+                // Populate pizza size ingredients
+                ['small', 'medium', 'large'].forEach(size => {
+                    const container = document.getElementById(size + 'IngredientsContainer');
+                    const ingredients = currentEditingItem.ingredients[size] || [];
+                    
+                    container.innerHTML = ingredients.map((ingredient, index) => 
+                        createIngredientRow(ingredient.name, ingredient.quantity, size, index)
+                    ).join('');
+                });
+            } else {
+                // Populate single item ingredients
+                const container = document.getElementById('singleIngredientsContainer');
+                const ingredients = currentEditingItem.ingredients.single || [];
+                
+                container.innerHTML = ingredients.map((ingredient, index) => 
+                    createIngredientRow(ingredient.name, ingredient.quantity, 'single', index)
+                ).join('');
+            }
+        }
+
+        // Create ingredient row HTML
+        function createIngredientRow(selectedIngredient, quantity, size, index) {
+            const ingredientOptions = availableIngredients.map(ingredient => 
+                `<option value="${ingredient}" ${ingredient === selectedIngredient ? 'selected' : ''}>${ingredient}</option>`
+            ).join('');
+
+            return `
+                <div class="flex items-center space-x-2 ingredient-row">
+                    <select class="flex-1 px-3 py-2 border border-border rounded-button focus:outline-none focus:ring-2 focus:ring-primary-500" 
+                            onchange="updateIngredient('${size}', ${index}, 'name', this.value)">
+                        <option value="">Seleccionar ingrediente</option>
+                        ${ingredientOptions}
+                    </select>
+                    <input type="number" min="0" step="0.01" value="${quantity}" 
+                           class="w-24 px-3 py-2 border border-border rounded-button focus:outline-none focus:ring-2 focus:ring-primary-500"
+                           placeholder="Cantidad"
+                           onchange="updateIngredient('${size}', ${index}, 'quantity', this.value)">
+                    <button type="button" onclick="removeIngredient('${size}', ${index})" 
+                            class="text-error-600 hover:text-error-800 px-2 py-2">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
+            `;
+        }
+
+        // Add ingredient to size
+        function addIngredientToSize(size) {
+            if (!currentEditingItem.ingredients[size]) {
+                currentEditingItem.ingredients[size] = [];
+            }
+            
+            currentEditingItem.ingredients[size].push({ name: '', quantity: 0 });
+            populateIngredients();
+        }
+
+        // Add ingredient to single
+        function addIngredientToSingle() {
+            if (!currentEditingItem.ingredients.single) {
+                currentEditingItem.ingredients.single = [];
+            }
+            
+            currentEditingItem.ingredients.single.push({ name: '', quantity: 0 });
+            populateIngredients();
+        }
+
+        // Update ingredient
+        function updateIngredient(size, index, field, value) {
+            if (!currentEditingItem.ingredients[size]) return;
+            
+            if (field === 'quantity') {
+                currentEditingItem.ingredients[size][index][field] = parseFloat(value) || 0;
+            } else {
+                currentEditingItem.ingredients[size][index][field] = value;
+            }
+        }
+
+        // Remove ingredient
+        function removeIngredient(size, index) {
+            if (!currentEditingItem.ingredients[size]) return;
+            
+            currentEditingItem.ingredients[size].splice(index, 1);
+            populateIngredients();
+        }
+
+        // Create new item
+        function createNewItem() {
+            currentEditingItem = {
+                id: Date.now(),
+                name: '',
+                category: '',
+                description: '',
+                image: '',
+                available: true,
+                pricing: {},
+                ingredients: {}
+            };
+            
+            showItemEditor();
+            document.getElementById('itemForm').reset();
+            document.getElementById('itemAvailable').checked = true;
+        }
+
+        // Save item
+        document.getElementById('itemForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            saveCurrentItem();
+        });
+
+        function saveCurrentItem() {
+            if (!currentEditingItem) return;
+
+            // Update basic information
+            currentEditingItem.name = document.getElementById('itemName').value;
+            currentEditingItem.category = document.getElementById('itemCategory').value;
+            currentEditingItem.description = document.getElementById('itemDescription').value;
+            currentEditingItem.image = document.getElementById('itemImage').value;
+            currentEditingItem.available = document.getElementById('itemAvailable').checked;
+
+            // Update pricing
+            if (currentEditingItem.category === 'pizzas') {
+                currentEditingItem.pricing = {
+                    small: parseFloat(document.getElementById('priceSmall').value) || 0,
+                    medium: parseFloat(document.getElementById('priceMedium').value) || 0,
+                    large: parseFloat(document.getElementById('priceLarge').value) || 0
+                };
+            } else {
+                currentEditingItem.pricing = {
+                    single: parseFloat(document.getElementById('itemPrice').value) || 0
+                };
+            }
+
+            // Update pricing section visibility
+            togglePricingSection(currentEditingItem.category);
+
+            // Check if this is a new item
+            const existingIndex = menuItems.findIndex(item => item.id === currentEditingItem.id);
+            if (existingIndex === -1) {
+                menuItems.push(currentEditingItem);
+            } else {
+                menuItems[existingIndex] = currentEditingItem;
+            }
+
+            renderMenuItemsList();
+            alert('Elemento guardado exitosamente');
+        }
+
+        // Duplicate item
+        function duplicateItem() {
+            if (!currentEditingItem) return;
+
+            const newItem = JSON.parse(JSON.stringify(currentEditingItem));
+            newItem.id = Date.now();
+            newItem.name = newItem.name + ' (Copia)';
+            
+            menuItems.push(newItem);
+            currentEditingItem = newItem;
+            
+            renderMenuItemsList();
+            populateEditor();
+            alert('Elemento duplicado exitosamente');
+        }
+
+        // Delete current item
+        function deleteCurrentItem() {
+            if (!currentEditingItem) return;
+
+            if (confirm('¿Estás seguro de eliminar este elemento del menú?')) {
+                menuItems = menuItems.filter(item => item.id !== currentEditingItem.id);
+                renderMenuItemsList();
+                hideItemEditor();
+                alert('Elemento eliminado exitosamente');
+            }
+        }
+
+        // Watch for category changes to toggle pricing sections
+        document.getElementById('itemCategory').addEventListener('change', function() {
+            togglePricingSection(this.value);
+        });
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', initMenuEditor);
+
+        // Export menu data for POS integration
+        function exportMenuForPOS() {
+            return menuItems.filter(item => item.available);
+        }
+
+        // Save menu data to localStorage for POS integration
+        function saveMenuData() {
+            localStorage.setItem('whankoos_menu_data', JSON.stringify(menuItems));
+        }
+
+        // Auto-save menu data when changes are made
+        const originalSaveCurrentItem = saveCurrentItem;
+        saveCurrentItem = function() {
+            originalSaveCurrentItem();
+            saveMenuData();
+        };
+
+        // Load menu data from localStorage on initialization
+        document.addEventListener('DOMContentLoaded', function() {
+            const savedMenu = localStorage.getItem('whankoos_menu_data');
+            if (savedMenu) {
+                menuItems = JSON.parse(savedMenu);
+            }
+            initMenuEditor();
+        });
+    </script>
+<script id="dhws-dataInjector" src="../public/dhws-data-injector.js"></script>
+</body>
+</html>
