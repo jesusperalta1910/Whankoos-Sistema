@@ -1,0 +1,818 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Finanzas Multiusuario (local)</title>
+  <style>
+    :root{
+      --bg:#0b1220; --card:#071028; --accent:#2563eb; --muted:#9aa7bf; --ok:#16a34a; --warn:#f59e0b; --danger:#ef4444;
+      font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+      color-scheme: dark;
+    }
+    *{box-sizing:border-box}
+    body{margin:0; min-height:100vh; background:linear-gradient(180deg,#020617 0%,#071028 100%); color:#e6eef8; padding:18px;}
+    .wrap{max-width:1100px;margin:0 auto;display:grid;grid-template-columns: 1fr 360px;gap:18px;}
+    header{grid-column:1/-1;display:flex;justify-content:space-between;align-items:center}
+    h1{font-size:20px;margin:0}
+    .card{background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));padding:14px;border-radius:12px;box-shadow:0 6px 20px rgba(2,6,23,0.6)}
+    .small{font-size:13px;color:var(--muted)}
+    input,select,textarea{padding:8px 10px;border-radius:8px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:inherit;outline:none;width:100%}
+    button{background:var(--accent);color:white;border:none;padding:8px 10px;border-radius:8px;cursor:pointer}
+    button.ghost{background:transparent;border:1px solid rgba(255,255,255,0.06)}
+    nav{display:flex;gap:8px}
+    nav button{background:transparent;border:1px solid rgba(255,255,255,0.04);padding:6px 8px;border-radius:8px;color:var(--muted)}
+    .hidden{display:none}
+    table{width:100%;border-collapse:collapse;font-size:14px}
+    th,td{padding:8px;text-align:left;border-bottom:1px dashed rgba(255,255,255,0.03)}
+    th{font-size:13px;color:var(--muted)}
+    .right{text-align:right}
+    .positive{color:var(--ok)}
+    .negative{color:var(--danger)}
+    .muted{color:var(--muted)}
+    footer{grid-column:1/-1;color:var(--muted);font-size:13px;margin-top:8px}
+    .tag{padding:6px 8px;border-radius:999px;background:rgba(255,255,255,0.02);font-size:13px}
+    .flex{display:flex;gap:8px;align-items:center}
+    @media (max-width:980px){.wrap{grid-template-columns:1fr}.aside {order:99}}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div>
+        <h1>Finanzas Multiusuario</h1>
+        <div class="small">Sistema local (IndexedDB) — pruebas y desarrollo</div>
+      </div>
+      <div id="userBox" class="flex">
+        <div class="small muted">No identificado</div>
+        <button id="btnOpenAuth" class="ghost">Ingresar / Registrar</button>
+      </div>
+    </header>
+
+    <!-- Main content -->
+    <main id="main" class="card">
+      <!-- Auth -->
+      <section id="authSection">
+        <h2>Acceso al sistema</h2>
+        <div class="small muted">Regístrate o inicia sesión. Puedes elegir rol: usuario, vendedor o admin.</div>
+        <div style="display:grid;gap:8px;margin-top:12px;">
+          <input id="authUser" placeholder="Usuario (ej: jramirez)" />
+          <input id="authPass" placeholder="Contraseña" type="password" />
+          <select id="authRole">
+            <option value="usuario">Usuario</option>
+            <option value="vendedor">Vendedor</option>
+            <option value="admin">Admin</option>
+          </select>
+          <div style="display:flex;gap:8px;">
+            <button id="btnRegister">Registrar</button>
+            <button id="btnLogin" class="ghost">Ingresar</button>
+          </div>
+          <div id="authMsg" class="small muted"></div>
+          <hr/>
+          <div class="small">O usa una cuenta de prueba:</div>
+          <div style="display:flex;gap:8px;margin-top:6px;">
+            <button id="seedUser" class="ghost">Crear cuenta demo (usuario)</button>
+            <button id="seedSeller" class="ghost">Crear demo (vendedor)</button>
+            <button id="seedAdmin" class="ghost">Crear demo (admin)</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Dashboard (oculto hasta login) -->
+      <section id="dashSection" class="hidden">
+        <div style="display:flex;justify-content:space-between;align-items:center;">
+          <div>
+            <h2 id="welcomeTitle">Bienvenido</h2>
+            <div class="small muted" id="roleTag"></div>
+          </div>
+          <div class="flex">
+            <button id="btnLogout" class="ghost">Salir</button>
+          </div>
+        </div>
+
+        <nav style="margin-top:12px;">
+          <button data-tab="trans">Transacciones</button>
+          <button data-tab="perfil">Perfil</button>
+          <button data-tab="market">Mercado</button>
+          <button data-tab="calc">Calculadoras</button>
+          <button data-tab="admin" id="tabAdmin" class="hidden">Admin</button>
+        </nav>
+
+        <div id="tabTrans" class="tabContent" style="margin-top:14px;">
+          <h3>Agregar transacción</h3>
+          <div style="display:grid;gap:8px;margin-top:8px;">
+            <select id="txTipo"><option value="ingreso">Ingreso</option><option value="gasto">Gasto</option></select>
+            <input id="txMonto" placeholder="Monto (ej: 200.50)" type="number" step="0.01"/>
+            <input id="txDesc" placeholder="Descripción (ej: sueldo, comida)" />
+            <select id="txCat">
+              <option>Sueldo</option><option>Comida</option><option>Transporte</option><option>Servicios</option><option>Ahorro</option><option>Otros</option>
+            </select>
+            <div style="display:flex;gap:8px;">
+              <button id="btnAddTx">Agregar</button>
+              <button id="btnExportCSV" class="ghost">Exportar CSV</button>
+              <button id="btnClearTx" class="ghost">Limpiar</button>
+            </div>
+          </div>
+
+          <h3 style="margin-top:12px;">Resumen</h3>
+          <div style="display:flex;gap:12px;align-items:center;justify-content:space-between;">
+            <div>
+              <div class="small muted">Balance</div>
+              <div id="balance" style="font-size:26px;font-weight:700">0.00</div>
+              <div class="small">Ingresos: <span id="totalIn" class="positive">0.00</span> • Gastos: <span id="totalOut" class="negative">0.00</span></div>
+            </div>
+            <div style="width:50%">
+              <div class="small muted">Progreso ahorro (meta)</div>
+              <div style="background:rgba(255,255,255,0.03);height:10px;border-radius:8px;margin-top:8px;overflow:hidden">
+                <div id="bar" style="height:100%;width:0%;background:linear-gradient(90deg,var(--accent),#7c3aed)"></div>
+              </div>
+              <div class="small" style="margin-top:6px">Meta: <input id="metaSave" type="number" value="200" style="width:120px;display:inline-block"/></div>
+            </div>
+          </div>
+
+          <h3 style="margin-top:12px;">Historial</h3>
+          <div style="max-height:280px;overflow:auto;margin-top:6px;">
+            <table><thead><tr><th>Fecha</th><th>Tipo</th><th>Descripción</th><th>Categoría</th><th class="right">Monto</th><th>Acción</th></tr></thead><tbody id="txTable"></tbody></table>
+          </div>
+        </div>
+
+        <div id="tabPerfil" class="tabContent hidden" style="margin-top:14px;">
+          <h3>Perfil</h3>
+          <div style="display:grid;gap:8px;max-width:520px">
+            <div>Usuario: <strong id="pfUser"></strong></div>
+            <div>Rol: <span id="pfRole" class="tag"></span></div>
+            <div>Editar contraseña</div>
+            <input id="newPass" type="password" placeholder="Nueva contraseña"/>
+            <div style="display:flex;gap:8px"><button id="btnChangePass">Guardar</button><button id="btnDeleteAccount" class="ghost">Eliminar cuenta</button></div>
+          </div>
+        </div>
+
+        <div id="tabMarket" class="tabContent hidden" style="margin-top:14px;">
+          <h3>Mercado / Publicaciones</h3>
+          <div class="small muted">Aquí se muestran las publicaciones (sistemas/servicios) que los vendedores ofrecen.</div>
+          <div style="display:flex;gap:12px;margin-top:10px;align-items:flex-start">
+            <div style="flex:1">
+              <div id="marketList" style="display:grid;gap:8px"></div>
+            </div>
+            <div style="width:320px">
+              <div class="card">
+                <div class="small muted">Publicar (solo vendedores)</div>
+                <input id="pubTitle" placeholder="Título (ej: Sistema de facturación)" />
+                <textarea id="pubDesc" placeholder="Descripción" rows="4"></textarea>
+                <input id="pubPrice" type="number" placeholder="Precio" />
+                <div style="display:flex;gap:8px;margin-top:8px">
+                  <button id="btnPublish">Publicar</button>
+                  <button id="btnMyPubs" class="ghost">Mis publicaciones</button>
+                </div>
+                <div id="pubMsg" class="small muted" style="margin-top:8px"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div id="tabCalc" class="tabContent hidden" style="margin-top:14px;">
+          <h3>Calculadoras</h3>
+          <div style="display:grid;gap:10px;grid-template-columns:1fr 1fr">
+            <div class="card">
+              <div class="small muted">Calculadora de préstamo</div>
+              <input id="loanAmt" type="number" placeholder="Monto préstamo"/>
+              <input id="loanRate" type="number" placeholder="Tasa anual (%)"/>
+              <input id="loanTerm" type="number" placeholder="Plazo (meses)"/>
+              <button id="calcLoan">Calcular cuota</button>
+              <div class="small">Cuota mensual: <strong id="loanRes">0.00</strong></div>
+            </div>
+            <div class="card">
+              <div class="small muted">Plan de ahorro</div>
+              <input id="goalAmt" type="number" placeholder="Meta total"/>
+              <input id="goalMonths" type="number" placeholder="Meses"/>
+              <button id="calcSave">Calcular aporte</button>
+              <div class="small">Aporte mensual: <strong id="saveRes">0.00</strong></div>
+            </div>
+          </div>
+        </div>
+
+        <div id="tabAdminPanel" class="tabContent hidden" style="margin-top:14px;">
+          <h3>Panel Admin</h3>
+          <div class="small muted">Lista de usuarios y acciones</div>
+          <div style="max-height:220px;overflow:auto;margin-top:8px;">
+            <table><thead><tr><th>ID</th><th>Usuario</th><th>Rol</th><th>Acción</th></tr></thead><tbody id="adminUsers"></tbody></table>
+          </div>
+        </div>
+
+      </section>
+    </main>
+
+    <!-- Aside -->
+    <aside class="aside">
+      <div class="card">
+        <h3>Información rápida</h3>
+        <div class="small muted">Estado de sesión y atajos</div>
+        <div style="margin-top:8px">
+          <div class="small">Usuario: <strong id="sideUser">-</strong></div>
+          <div class="small">Rol: <span id="sideRole">-</span></div>
+        </div>
+        <hr style="margin:8px 0"/>
+        <div class="small muted">Atajos</div>
+        <ul style="padding-left:16px;margin:6px 0 0 0;">
+          <li>Regístrate y elige rol.</li>
+          <li>Vendedores publican sistemas en Mercado.</li>
+          <li>Admin puede ver cuentas y borrar publicaciones.</li>
+        </ul>
+      </div>
+
+      <div class="card" style="margin-top:12px">
+        <h4>Exportar / Importar BD</h4>
+        <div class="small muted">Respaldos locales (JSON)</div>
+        <div style="display:flex;gap:8px;margin-top:8px">
+          <button id="btnBackup">Exportar BD</button>
+          <button id="btnRestore" class="ghost">Importar JSON</button>
+          <input id="fileRestore" type="file" accept=".json" class="hidden"/>
+        </div>
+        <div id="backupMsg" class="small muted" style="margin-top:8px"></div>
+      </div>
+    </aside>
+
+    <footer>Hecho por Jesús · Demo local · Guarda copia antes de cerrar el navegador</footer>
+  </div>
+
+<script>
+/*
+  Finanzas Multiusuario (single-file)
+  - IndexedDB como "base de datos" local
+  - Registro/login con hash (SHA-256)
+  - Roles: usuario / vendedor / admin
+  - Transacciones por usuario
+  - Publicaciones (vendedores)
+  - Admin: ver usuarios
+  - Backup / restore JSON
+*/
+
+// ------------- Utilities -------------
+function el(id){ return document.getElementById(id) }
+function fmt(n){ if(isNaN(n)) return '0.00'; return Number(n).toLocaleString('es-VE',{minimumFractionDigits:2,maximumFractionDigits:2}); }
+function nowISO(){ return new Date().toISOString(); }
+function readable(iso){ return new Date(iso).toLocaleString(); }
+
+// Hash password using SHA-256, return hex
+async function hashPass(pass){
+  const enc = new TextEncoder().encode(pass);
+  const hash = await crypto.subtle.digest('SHA-256', enc);
+  const arr = Array.from(new Uint8Array(hash));
+  return arr.map(b=>b.toString(16).padStart(2,'0')).join('');
+}
+
+// ------------- IndexedDB wrapper -------------
+const DB_NAME = 'finanzas_local_v1';
+const DB_VERSION = 1;
+let db;
+function openDB(){
+  return new Promise((resolve, reject)=>{
+    const rq = indexedDB.open(DB_NAME, DB_VERSION);
+    rq.onupgradeneeded = (e) => {
+      const idb = e.target.result;
+      if(!idb.objectStoreNames.contains('users')){
+        const us = idb.createObjectStore('users', { keyPath: 'id', autoIncrement: true });
+        us.createIndex('username', 'username', { unique: true });
+      }
+      if(!idb.objectStoreNames.contains('tx')){
+        const txs = idb.createObjectStore('tx', { keyPath: 'id', autoIncrement: true });
+        txs.createIndex('user', 'userId');
+      }
+      if(!idb.objectStoreNames.contains('pubs')){
+        const ps = idb.createObjectStore('pubs', { keyPath: 'id', autoIncrement: true });
+        ps.createIndex('seller', 'sellerId');
+      }
+    };
+    rq.onsuccess = (e)=>{ db = e.target.result; resolve(db); };
+    rq.onerror = (e)=> reject(e.target.error);
+  });
+}
+function dbAdd(store, obj){
+  return new Promise((res,rej)=>{
+    const tx = db.transaction(store, 'readwrite');
+    const st = tx.objectStore(store);
+    const rq = st.add(obj);
+    rq.onsuccess = ()=> res(rq.result);
+    rq.onerror = ()=> rej(rq.error);
+  });
+}
+function dbPut(store, obj){
+  return new Promise((res,rej)=>{
+    const tx = db.transaction(store, 'readwrite');
+    const st = tx.objectStore(store);
+    const rq = st.put(obj);
+    rq.onsuccess = ()=> res(rq.result);
+    rq.onerror = ()=> rej(rq.error);
+  });
+}
+function dbGetByIndex(store, indexName, value){
+  return new Promise((res,rej)=>{
+    const tx = db.transaction(store,'readonly');
+    const st = tx.objectStore(store);
+    const idx = st.index(indexName);
+    const rq = idx.get(value);
+    rq.onsuccess = ()=> res(rq.result);
+    rq.onerror = ()=> rej(rq.error);
+  });
+}
+function dbGetAll(store, indexName=null, value=null){
+  return new Promise((res,rej)=>{
+    const tx = db.transaction(store,'readonly');
+    const st = tx.objectStore(store);
+    let rq;
+    if(indexName && value !== null){
+      const idx = st.index(indexName);
+      rq = idx.getAll(value);
+    } else {
+      rq = st.getAll();
+    }
+    rq.onsuccess = ()=> res(rq.result);
+    rq.onerror = ()=> rej(rq.error);
+  });
+}
+function dbDelete(store, key){
+  return new Promise((res,rej)=>{
+    const tx = db.transaction(store,'readwrite');
+    const st = tx.objectStore(store);
+    const rq = st.delete(key);
+    rq.onsuccess = ()=> res();
+    rq.onerror = ()=> rej(rq.error);
+  });
+}
+
+// ------------- App state -------------
+let session = null; // {id, username, role}
+
+// ------------- UI refs -------------
+const authSection = el('authSection');
+const dashSection = el('dashSection');
+const userBox = el('userBox');
+const btnOpenAuth = el('btnOpenAuth');
+const authMsg = el('authMsg');
+const btnLogin = el('btnLogin');
+const btnRegister = el('btnRegister');
+const authUser = el('authUser');
+const authPass = el('authPass');
+const authRole = el('authRole');
+const seedUser = el('seedUser');
+const seedSeller = el('seedSeller');
+const seedAdmin = el('seedAdmin');
+const welcomeTitle = el('welcomeTitle');
+const roleTag = el('roleTag');
+const sideUser = el('sideUser');
+const sideRole = el('sideRole');
+const btnLogout = el('btnLogout');
+const tabs = document.querySelectorAll('nav button[data-tab]');
+const tabTrans = el('tabTrans');
+const tabPerfil = el('tabPerfil');
+const tabMarket = el('tabMarket');
+const tabCalc = el('tabCalc');
+const tabAdminPanel = el('tabAdminPanel');
+const tabAdminBtn = el('tabAdmin');
+const txTipo = el('txTipo');
+const txMonto = el('txMonto');
+const txDesc = el('txDesc');
+const txCat = el('txCat');
+const btnAddTx = el('btnAddTx');
+const txTable = el('txTable');
+const totalIn = el('totalIn');
+const totalOut = el('totalOut');
+const balanceEl = el('balance');
+const bar = el('bar');
+const metaSave = el('metaSave');
+const btnExportCSV = el('btnExportCSV');
+const btnClearTx = el('btnClearTx');
+const pfUser = el('pfUser');
+const pfRole = el('pfRole');
+const newPass = el('newPass');
+const btnChangePass = el('btnChangePass');
+const btnDeleteAccount = el('btnDeleteAccount');
+const pubTitle = el('pubTitle');
+const pubDesc = el('pubDesc');
+const pubPrice = el('pubPrice');
+const btnPublish = el('btnPublish');
+const marketList = el('marketList');
+const btnMyPubs = el('btnMyPubs');
+const pubMsg = el('pubMsg');
+const loanAmt = el('loanAmt');
+const loanRate = el('loanRate');
+const loanTerm = el('loanTerm');
+const calcLoanBtn = el('calcLoan');
+const loanRes = el('loanRes');
+const goalAmt = el('goalAmt');
+const goalMonths = el('goalMonths');
+const calcSaveBtn = el('calcSave');
+const saveRes = el('saveRes');
+const adminUsers = el('adminUsers');
+const btnBackup = el('btnBackup');
+const btnRestore = el('btnRestore');
+const fileRestore = el('fileRestore');
+const backupMsg = el('backupMsg');
+
+// ------------- App logic -------------
+async function init(){
+  await openDB();
+  wireEvents();
+  updateSessionUI();
+  showAuth();
+}
+
+function wireEvents(){
+  btnOpenAuth.addEventListener('click', ()=>{ showAuth(); });
+  btnRegister.addEventListener('click', onRegister);
+  btnLogin.addEventListener('click', onLogin);
+  seedUser.addEventListener('click', ()=>seedDemo('usuario'));
+  seedSeller.addEventListener('click', ()=>seedDemo('vendedor'));
+  seedAdmin.addEventListener('click', ()=>seedDemo('admin'));
+  btnLogout.addEventListener('click', onLogout);
+  tabs.forEach(b=>b.addEventListener('click', ()=>showTab(b.dataset.tab)));
+  btnAddTx.addEventListener('click', addTx);
+  btnExportCSV.addEventListener('click', exportCSV);
+  btnClearTx.addEventListener('click', ()=>{ txMonto.value=''; txDesc.value=''; txTipo.value='ingreso'; txCat.value='Sueldo'; });
+  metaSave.addEventListener('change', renderSummary);
+  btnChangePass.addEventListener('click', changePassword);
+  btnDeleteAccount.addEventListener('click', deleteAccount);
+  btnPublish.addEventListener('click', publishItem);
+  btnMyPubs.addEventListener('click', showMyPubs);
+  calcLoanBtn.addEventListener('click', calcLoan);
+  calcSaveBtn.addEventListener('click', calcSave);
+  btnBackup.addEventListener('click', backupDB);
+  btnRestore.addEventListener('click', ()=>fileRestore.click());
+  fileRestore.addEventListener('change', handleRestore);
+  el('btnOpenAuth').addEventListener('click', ()=>{ showAuth(); });
+}
+
+// UI helpers
+function showAuth(){ authSection.classList.remove('hidden'); dashSection.classList.add('hidden'); }
+function showDashboard(){ authSection.classList.add('hidden'); dashSection.classList.remove('hidden'); showTab('trans'); }
+function updateSessionUI(){
+  if(session){
+    userBox.querySelector('.small').textContent = session.username;
+    sideUser.textContent = session.username;
+    sideRole.textContent = session.role;
+    el('btnOpenAuth').classList.add('hidden');
+    el('userBox').querySelector('.small').textContent = session.username;
+    el('userBox').querySelector('.small').style.color = '#fff';
+  } else {
+    el('btnOpenAuth').classList.remove('hidden');
+    sideUser.textContent = '-';
+    sideRole.textContent = '-';
+  }
+}
+function showTab(t){
+  // hide all
+  ['tabTrans','tabPerfil','tabMarket','tabCalc','tabAdminPanel'].forEach(id=> el(id).classList.add('hidden'));
+  el('tab'+capitalize(t)).classList.remove('hidden');
+}
+function capitalize(s){ return s.charAt(0).toUpperCase()+s.slice(1); }
+
+// Auth actions
+async function onRegister(){
+  const username = authUser.value.trim();
+  const pass = authPass.value;
+  const role = authRole.value;
+  if(!username || !pass) return authMsg.textContent = 'Usuario y contraseña obligatorios';
+  const hashed = await hashPass(pass);
+  try{
+    await dbAdd('users', { username, password: hashed, role });
+    authMsg.textContent = 'Registrado correctamente. Ahora ingresa.';
+    authUser.value=''; authPass.value='';
+  }catch(e){
+    authMsg.textContent = 'Error: usuario ya existe';
+  }
+}
+async function onLogin(){
+  const username = authUser.value.trim();
+  const pass = authPass.value;
+  if(!username || !pass) return authMsg.textContent = 'Rellena usuario y contraseña';
+  try{
+    const user = await dbGetByIndex('users','username',username);
+    if(!user) { authMsg.textContent = 'Usuario no encontrado'; return; }
+    const hashed = await hashPass(pass);
+    if(hashed !== user.password){ authMsg.textContent = 'Contraseña incorrecta'; return; }
+    session = { id: user.id, username: user.username, role: user.role };
+    authMsg.textContent = '';
+    afterLogin();
+  }catch(e){
+    authMsg.textContent = 'Error al iniciar sesión';
+  }
+}
+async function afterLogin(){
+  updateSessionUI();
+  welcomeTitle.textContent = `Hola, ${session.username}`;
+  roleTag.textContent = session.role.toUpperCase();
+  pfUser.textContent = session.username;
+  pfRole.textContent = session.role;
+  // show admin tab if admin
+  if(session.role === 'admin') tabAdminBtn.classList.remove('hidden'); else tabAdminBtn.classList.add('hidden');
+  showDashboard();
+  await renderAll();
+}
+
+// logout
+function onLogout(){
+  session = null;
+  updateSessionUI();
+  showAuth();
+}
+
+// demo seeding
+async function seedDemo(role){
+  const name = 'demo_'+role;
+  try{
+    const hashed = await hashPass('123456');
+    // try to add, if exists ignore
+    await dbAdd('users',{ username:name, password:hashed, role });
+  }catch(e){}
+  authUser.value = name;
+  authPass.value = '123456';
+  authRole.value = role;
+  authMsg.textContent = `Cuenta demo lista: ${name} / 123456 (rol: ${role})`;
+}
+
+// transactions
+async function addTx(){
+  if(!session) return alert('Inicia sesión');
+  const tipo = txTipo.value;
+  const monto = Number(txMonto.value);
+  if(!monto || isNaN(monto)) return alert('Monto inválido');
+  const desc = txDesc.value || '';
+  const cat = txCat.value;
+  const obj = { userId: session.id, tipo, monto, descripcion:desc, categoria:cat, fecha: nowISO() };
+  await dbAdd('tx', obj);
+  txMonto.value=''; txDesc.value='';
+  await renderAll();
+}
+
+async function getUserTxs(uId){
+  const all = await dbGetAll('tx');
+  return all.filter(t=>t.userId === uId).sort((a,b)=> b.fecha.localeCompare(a.fecha));
+}
+
+function formatTxRow(t){
+  const sign = t.tipo === 'ingreso' ? '+' : '-';
+  return `<tr>
+    <td>${readable(t.fecha)}</td>
+    <td>${t.tipo}</td>
+    <td>${escapeHtml(t.descripcion||'')}</td>
+    <td><span class="tag">${escapeHtml(t.categoria)}</span></td>
+    <td class="right ${t.tipo==='ingreso'?'positive':'negative'}">${sign} ${fmt(t.monto)}</td>
+    <td><button data-id="${t.id}" class="ghost editTx">Editar</button> <button data-id="${t.id}" class="ghost delTx">Borrar</button></td>
+  </tr>`;
+}
+
+function escapeHtml(s){ return s.replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;'); }
+
+async function renderTxTable(){
+  txTable.innerHTML = '';
+  if(!session) return;
+  const list = await getUserTxs(session.id);
+  if(list.length===0) { txTable.innerHTML = '<tr><td colspan="6" class="muted">Sin transacciones</td></tr>'; return; }
+  txTable.innerHTML = list.map(formatTxRow).join('');
+  // wire buttons
+  txTable.querySelectorAll('.delTx').forEach(b=> b.addEventListener('click', async (ev)=>{
+    const id = Number(ev.currentTarget.dataset.id);
+    if(confirm('¿Eliminar transacción?')){ await dbDelete('tx', id); renderAll(); }
+  }));
+  txTable.querySelectorAll('.editTx').forEach(b=> b.addEventListener('click', async (ev)=>{
+    const id = Number(ev.currentTarget.dataset.id);
+    const txs = await dbGetAll('tx');
+    const t = txs.find(x=>x.id===id);
+    if(!t) return;
+    const nuevo = prompt('Nuevo monto', t.monto);
+    if(nuevo===null) return;
+    const m = Number(nuevo);
+    if(isNaN(m)) return alert('Monto inválido');
+    t.monto = m;
+    await dbPut('tx', t);
+    renderAll();
+  }));
+}
+
+// summary
+async function renderSummary(){
+  if(!session) return;
+  const list = await getUserTxs(session.id);
+  let ingresos=0, gastos=0;
+  const byCat = {};
+  list.forEach(t=>{
+    if(t.tipo==='ingreso') ingresos += Number(t.monto);
+    else gastos += Number(t.monto);
+    byCat[t.categoria] = (byCat[t.categoria] || 0) + (t.tipo==='ingreso' ? t.monto : -t.monto);
+  });
+  totalIn.textContent = fmt(ingresos);
+  totalOut.textContent = fmt(gastos);
+  const balance = ingresos - gastos;
+  balanceEl.textContent = fmt(balance);
+  const ahorro = byCat['Ahorro'] || 0;
+  const meta = Number(metaSave.value) || 0;
+  const pct = meta>0 ? Math.min(100, Math.max(0, (ahorro / meta)*100)) : 0;
+  bar.style.width = pct + '%';
+  // categories view (not shown but could be)
+}
+
+// export CSV
+async function exportCSV(){
+  if(!session) return alert('Inicia sesión');
+  const list = await getUserTxs(session.id);
+  if(list.length===0) return alert('Sin datos');
+  const header = ['fecha','tipo','descripcion','categoria','monto'];
+  const rows = list.map(t=> [t.fecha, t.tipo, `"${(t.descripcion||'').replace(/"/g,'""')}"`, t.categoria, t.monto]);
+  const csv = [header.join(','), ...rows.map(r=>r.join(','))].join('\n');
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a'); a.href = url; a.download = `${session.username}_trans.csv`; a.click();
+  URL.revokeObjectURL(url);
+}
+
+// profile
+async function changePassword(){
+  if(!session) return alert('Inicia sesión');
+  const np = newPass.value;
+  if(!np) return alert('Ingresa nueva contraseña');
+  const h = await hashPass(np);
+  const user = await dbGetByIndex('users','username', session.username);
+  user.password = h;
+  await dbPut('users', user);
+  newPass.value='';
+  alert('Contraseña actualizada');
+}
+async function deleteAccount(){
+  if(!session) return;
+  if(!confirm('¿Eliminar tu cuenta y todos tus datos?')) return;
+  // delete user txs
+  const allTx = await dbGetAll('tx');
+  for(const t of allTx.filter(x=>x.userId===session.id)) await dbDelete('tx', t.id);
+  // delete pubs
+  const allPubs = await dbGetAll('pubs');
+  for(const p of allPubs.filter(x=>x.sellerId===session.id)) await dbDelete('pubs', p.id);
+  // delete user
+  await dbDelete('users', session.id);
+  alert('Cuenta eliminada');
+  session = null;
+  updateSessionUI();
+  showAuth();
+}
+
+// publications (market)
+async function publishItem(){
+  if(!session) return alert('Inicia sesión');
+  if(session.role !== 'vendedor') return pubMsg.textContent = 'Solo vendedores pueden publicar';
+  const title = pubTitle.value.trim();
+  const desc = pubDesc.value.trim();
+  const price = Number(pubPrice.value);
+  if(!title || !desc || !price) return pubMsg.textContent = 'Completa todos los campos';
+  await dbAdd('pubs', { sellerId: session.id, title, description: desc, price, created: nowISO() });
+  pubMsg.textContent = 'Publicado';
+  pubTitle.value=''; pubDesc.value=''; pubPrice.value='';
+  await renderMarket();
+}
+
+async function renderMarket(){
+  const pubs = await dbGetAll('pubs');
+  if(pubs.length===0) marketList.innerHTML = '<div class="muted">Sin publicaciones</div>';
+  else marketList.innerHTML = pubs.sort((a,b)=> b.created.localeCompare(a.created)).map(p=>{
+    return `<div class="card">
+      <div style="display:flex;justify-content:space-between">
+        <div><strong>${escapeHtml(p.title)}</strong><div class="small muted">${escapeHtml(p.description)}</div></div>
+        <div class="right"><div style="font-weight:700">${fmt(p.price)}</div><div class="small muted">Publicado: ${readable(p.created)}</div></div>
+      </div>
+      <div style="display:flex;gap:8px;margin-top:8px">
+        <button class="buyBtn" data-id="${p.id}">Comprar</button>
+        <button class="ghost viewSeller" data-id="${p.sellerId}">Vendedor</button>
+        ${session && session.role === 'admin' ? `<button class="ghost delPub" data-id="${p.id}">Eliminar</button>` : ''}
+      </div>
+    </div>`;
+  }).join('');
+  // wire buttons
+  marketList.querySelectorAll('.buyBtn').forEach(b=> b.addEventListener('click', async (ev)=>{
+    if(!session) return alert('Inicia sesión para comprar');
+    const id = Number(ev.currentTarget.dataset.id);
+    const pubs = await dbGetAll('pubs');
+    const p = pubs.find(x=>x.id===id);
+    if(!p) return;
+    // create a tx: gasto for buyer, ingreso for seller
+    if(confirm(`Comprar "${p.title}" por ${fmt(p.price)}?`)){
+      await dbAdd('tx', { userId: session.id, tipo:'gasto', monto: p.price, descripcion: `Compra: ${p.title}`, categoria: 'Compras', fecha: nowISO() });
+      const seller = await dbGetByIndex('users','username', (await dbGetAll('users')).find(u => u.id === p.sellerId)?.username );
+      // add income to seller if exists
+      await dbAdd('tx', { userId: p.sellerId, tipo:'ingreso', monto: p.price, descripcion: `Venta: ${p.title}`, categoria: 'Ventas', fecha: nowISO() });
+      alert('Compra registrada. Se generaron transacciones para comprador y vendedor.');
+      await renderAll();
+    }
+  }));
+  marketList.querySelectorAll('.viewSeller').forEach(b=> b.addEventListener('click', async (ev)=>{
+    const id = Number(ev.currentTarget.dataset.id);
+    const users = await dbGetAll('users');
+    const u = users.find(x=>x.id === id);
+    if(!u) return alert('Vendedor no encontrado');
+    alert(`Vendedor: ${u.username} (rol: ${u.role})`);
+  }));
+  marketList.querySelectorAll('.delPub').forEach(b=> b.addEventListener('click', async (ev)=>{
+    const id = Number(ev.currentTarget.dataset.id);
+    if(!confirm('Eliminar publicación?')) return;
+    await dbDelete('pubs', id);
+    await renderMarket();
+  }));
+}
+
+async function showMyPubs(){
+  if(!session) return alert('Inicia sesión');
+  const pubs = await dbGetAll('pubs');
+  const mine = pubs.filter(p=>p.sellerId === session.id);
+  if(mine.length===0) return alert('No tienes publicaciones');
+  alert('Tienes '+mine.length+' publicaciones. Mira la sección Mercado.');
+}
+
+// calculators
+function calcLoan(){
+  const P = Number(loanAmt.value);
+  const annual = Number(loanRate.value);
+  const n = Number(loanTerm.value);
+  if(!P || !n) return alert('Monto y plazo obligatorios');
+  const r = (annual/100)/12;
+  let cuota;
+  if(r===0) cuota = P / n;
+  else cuota = P * (r * Math.pow(1+r,n)) / (Math.pow(1+r,n)-1);
+  loanRes.textContent = fmt(cuota);
+}
+function calcSave(){
+  const goal = Number(goalAmt.value);
+  const months = Number(goalMonths.value);
+  if(!goal || !months) return alert('Meta y meses obligatorios');
+  const aporte = goal / months;
+  saveRes.textContent = fmt(aporte);
+}
+
+// admin panel
+async function renderAdmin(){
+  const users = await dbGetAll('users');
+  adminUsers.innerHTML = users.map(u=> `<tr><td>${u.id}</td><td>${escapeHtml(u.username)}</td><td>${u.role}</td><td><button class="ghost delUser" data-id="${u.id}">Eliminar</button></td></tr>`).join('');
+  adminUsers.querySelectorAll('.delUser').forEach(b=> b.addEventListener('click', async (ev)=>{
+    const id = Number(ev.currentTarget.dataset.id);
+    if(!confirm('Eliminar usuario y sus datos?')) return;
+    // delete txs and pubs
+    const txs = await dbGetAll('tx'), pubs = await dbGetAll('pubs');
+    for(const t of txs.filter(x=>x.userId===id)) await dbDelete('tx', t.id);
+    for(const p of pubs.filter(x=>x.sellerId===id)) await dbDelete('pubs', p.id);
+    await dbDelete('users', id);
+    await renderAdmin();
+  }));
+}
+
+// backup / restore
+async function backupDB(){
+  const users = await dbGetAll('users');
+  const txs = await dbGetAll('tx');
+  const pubs = await dbGetAll('pubs');
+  const data = { users, txs, pubs, exportedAt: nowISO() };
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a'); a.href = url; a.download = 'finanzas_backup.json'; a.click();
+  URL.revokeObjectURL(url);
+  backupMsg.textContent = 'Backup descargado';
+}
+function handleRestore(e){
+  const f = e.target.files[0];
+  if(!f) return;
+  const r = new FileReader();
+  r.onload = async ()=>{
+    try{
+      const data = JSON.parse(r.result);
+      // simple restore: drop and re-add - for demo only
+      // Clear stores (delete DB and reopen)
+      db.close();
+      const del = indexedDB.deleteDatabase(DB_NAME);
+      del.onsuccess = async ()=> {
+        await openDB();
+        // re-insert data
+        for(const u of data.users || []) {
+          const uu = {...u}; delete uu.id; await dbAdd('users', uu);
+        }
+        for(const t of data.txs || []) { const tt = {...t}; delete tt.id; await dbAdd('tx', tt); }
+        for(const p of data.pubs || []) { const pp = {...p}; delete pp.id; await dbAdd('pubs', pp); }
+        backupMsg.textContent = 'Importación completada';
+      };
+      del.onerror = ()=> backupMsg.textContent = 'Error importando';
+    }catch(err){ backupMsg.textContent = 'Archivo inválido'; }
+  };
+  r.readAsText(f);
+}
+
+// render all relevant views
+async function renderAll(){
+  if(!session) return;
+  await renderTxTable();
+  await renderSummary();
+  await renderMarket();
+  if(session.role === 'admin') await renderAdmin();
+  sideUser.textContent = session.username;
+  sideRole.textContent = session.role;
+}
+
+// initial call
+init();
+
+</script>
+</body>
+</html>
